@@ -15,7 +15,7 @@ public class DefaultWrapper extends HttpServlet  {
             throws ServletException, IOException {
         RequestDispatcher rd = getServletContext().getNamedDispatcher("default");
         HttpServletRequest wrapped = new HttpServletRequestWrapper(req) {
-            public String getServletPath() { return ""; }
+            public String getServletPath() { return req.getServletPath(); }
         };
         rd.forward(wrapped, resp);
     }
