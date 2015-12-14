@@ -6,7 +6,7 @@
 
     <!-- home page -->
     <welcome-file-list>
-        <welcome-file>w/index.html</welcome-file>
+        <welcome-file>/w/index.html</welcome-file>
     </welcome-file-list>
 
     <!-- wrap default servlet to solve the conflict with websocket -->
