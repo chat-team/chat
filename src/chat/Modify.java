@@ -2,7 +2,9 @@ package chat;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -12,24 +14,28 @@ import java.sql.ResultSet;
 /**
  * Created by Dongfang on 2015/12/15.
  */
-@WebServlet(name = "Login")
-public class Login extends HttpServlet {
-    public void doGet(HttpServletRequest request, HttpServletResponse response)
+@WebServlet(name = "Modify")
+public class Modify extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doPost(request, response);
-    }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
         String username = request.getParameter("userid");
         String password = request.getParameter("passwd");
-
+        String newpassword = request.getParameter("newpasswd");
+        String nickname = request.getParameter("nickname");
+        String email = request.getParameter("email");
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
 
-        if (password == "" || username == "") {
+        if (username == "" || password == "" || nickname == "") {
             out.println("failed");
             return;
+        }
+
+        try {
+            newpassword = CipherUtil.encoderByMd5(newpassword);
+        }catch (Exception e) {
+            e.printStackTrace();
         }
 
         DatabaseConnection dbConn = new DatabaseConnection();
@@ -52,6 +58,26 @@ public class Login extends HttpServlet {
             else {
                 out.println("error");
             }
+
+            if (newpassword == "") {
+                sql = "UPDATE user_info set nikename = ?, email = ? WHERE userid = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setObject(3, username);
+                ps.setObject(1, nickname);
+                ps.setObject(2, email);
+                ps.executeUpdate();
+            }
+
+            if (newpassword != "") {
+                sql = "UPDATE user_info set passwd = ?, nikename = ?, email = ? WHERE userid = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setObject(4, username);
+                ps.setObject(2, nickname);
+                ps.setObject(1, newpassword);
+                ps.setObject(3, email);
+                ps.executeUpdate();
+            }
+            out.println("success");
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -70,8 +96,10 @@ public class Login extends HttpServlet {
                 e.printStackTrace();
             }
         }
+    }
 
-
-
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doPost(request, response);
     }
 }

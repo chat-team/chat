@@ -39,4 +39,28 @@
         <url-pattern>/login</url-pattern>
     </servlet-mapping>
 
+    <!-- register -->
+    <servlet>
+        <servlet-name>register</servlet-name>
+        <servlet-class>chat.Register</servlet-class>
+    </servlet>
+
+    <!-- register servlet -->
+    <servlet-mapping>
+        <servlet-name>register</servlet-name>
+        <url-pattern>/register</url-pattern>
+    </servlet-mapping>
+
+    <!-- modify -->
+    <servlet>
+        <servlet-name>modify</servlet-name>
+        <servlet-class>chat.Modify</servlet-class>
+    </servlet>
+
+    <!-- modify servlet -->
+    <servlet-mapping>
+        <servlet-name>modify</servlet-name>
+        <url-pattern>/modify</url-pattern>
+    </servlet-mapping>
+
 </web-app>
