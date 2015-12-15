@@ -57,14 +57,14 @@ public class Login extends HttpServlet {
         }
         finally {
             try {
-                if (conn != null) {
-                    conn.close();
+                if (rs != null) {
+                    rs.close();
                 }
                 if (ps != null) {
                     ps.close();
                 }
-                if (rs != null) {
-                    rs.close();
+                if (conn != null) {
+                    conn.close();
                 }
             } catch (Exception e) {
                 e.printStackTrace();

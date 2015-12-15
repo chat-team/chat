@@ -46,7 +46,7 @@ public class Register extends HttpServlet {
         Connection conn = dbConn.getConnection();
         String sql = "SELECT COUNT(*) as rowCount FROM user_info";
         ResultSet rs = null;
-        PreparedStatement ps = null;
+        PreparedStatement ps = null, ps1 = null;
         int username = 0;
         try {
             ps = conn.prepareStatement(sql);
@@ -54,14 +54,14 @@ public class Register extends HttpServlet {
             if (rs.next()) {
                 username = rs.getInt("rowCount");
             }
-
             sql = "INSERT INTO user_info VALUES (?,?,?,?)";
-            ps = conn.prepareStatement(sql);
-            ps.setInt(1, ++username);
-            ps.setObject(2, nickname);
-            ps.setObject(3, password);
-            ps.setObject(4, email);
-            ps.executeUpdate();
+            ps1 = conn.prepareStatement(sql);
+            ps1.setInt(1, ++username);
+            ps1.setString(2, nickname);
+            ps1.setString(3, password);
+            ps1.setString(4, email);
+            ps1.executeUpdate();
+            ps1.close();
             out.println("success");
             out.println(username);
         } catch(Exception e) {
@@ -69,14 +69,14 @@ public class Register extends HttpServlet {
         }
         finally {
             try {
-                if (conn != null) {
-                    conn.close();
+                if (rs != null) {
+                    rs.close();
                 }
                 if (ps != null) {
                     ps.close();
                 }
-                if (rs != null) {
-                    rs.close();
+                if (conn != null) {
+                    conn.close();
                 }
             } catch (Exception e) {
                 e.printStackTrace();

@@ -42,6 +42,7 @@ public class Modify extends HttpServlet {
         Connection conn = dbConn.getConnection();
         String sql = "SELECT * FROM user_info WHERE userid = ?";
         PreparedStatement ps = null;
+        PreparedStatement ps1 = null, ps2 = null;
         ResultSet rs = null;
         try {
             ps = conn.prepareStatement(sql);
@@ -58,24 +59,25 @@ public class Modify extends HttpServlet {
             else {
                 out.println("error");
             }
-
             if (newpassword == "") {
                 sql = "UPDATE user_info set nikename = ?, email = ? WHERE userid = ?";
-                ps = conn.prepareStatement(sql);
-                ps.setObject(3, username);
-                ps.setObject(1, nickname);
-                ps.setObject(2, email);
-                ps.executeUpdate();
+                ps1 = conn.prepareStatement(sql);
+                ps1.setObject(3, username);
+                ps1.setObject(1, nickname);
+                ps1.setObject(2, email);
+                ps1.executeUpdate();
+                ps1.close();
             }
-
+            ps.clearParameters();
             if (newpassword != "") {
                 sql = "UPDATE user_info set passwd = ?, nikename = ?, email = ? WHERE userid = ?";
-                ps = conn.prepareStatement(sql);
-                ps.setObject(4, username);
-                ps.setObject(2, nickname);
-                ps.setObject(1, newpassword);
-                ps.setObject(3, email);
-                ps.executeUpdate();
+                ps2 = conn.prepareStatement(sql);
+                ps2.setObject(4, username);
+                ps2.setObject(2, nickname);
+                ps2.setObject(1, newpassword);
+                ps2.setObject(3, email);
+                ps2.executeUpdate();
+                ps2.close();
             }
             out.println("success");
         } catch(Exception e) {
@@ -83,14 +85,14 @@ public class Modify extends HttpServlet {
         }
         finally {
             try {
-                if (conn != null) {
-                    conn.close();
+                if (rs != null) {
+                    rs.close();
                 }
                 if (ps != null) {
                     ps.close();
                 }
-                if (rs != null) {
-                    rs.close();
+                if (conn != null) {
+                    conn.close();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
