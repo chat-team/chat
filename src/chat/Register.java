@@ -20,19 +20,16 @@ public class Register extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String password = request.getParameter("passwd");
-        String nickname = request.getParameter("nickname");
-        String email = request.getParameter("email");
-        /*Map<String, String[]> map = request.getParameterMap();
-        String password = map.get("password")[0];
-        String nickname = map.get("nickname")[0];
-        String email = map.get("email")[0];*/
+        ReqReader reader = new ReqReader(request.getInputStream());
+        ResWriter writer = new ResWriter(response.getOutputStream());
+        String password = reader.getString("passwd");
+        String nickname = reader.getString("nickname");
+        String email = reader.getString("email");
 
         response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
 
         if (password == "" || nickname == "") {
-            out.println("failed");
+            writer.add("status", "failed").write();
             return;
         }
 
@@ -54,7 +51,7 @@ public class Register extends HttpServlet {
             if (rs.next()) {
                 username = rs.getInt("rowCount");
             }
-            sql = "INSERT INTO user_info VALUES (?,?,?,?)";
+            sql = "INSERT INTO user_info (userid, nickname, passwd, email) VALUES (?,?,?,?)";
             ps1 = conn.prepareStatement(sql);
             ps1.setInt(1, ++username);
             ps1.setString(2, nickname);
@@ -62,8 +59,8 @@ public class Register extends HttpServlet {
             ps1.setString(4, email);
             ps1.executeUpdate();
             ps1.close();
-            out.println("success");
-            out.println(username);
+            writer.add("status", "success");
+            writer.add("username", username).write();
         } catch(Exception e) {
             e.printStackTrace();
         }

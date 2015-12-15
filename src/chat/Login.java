@@ -21,14 +21,16 @@ public class Login extends HttpServlet {
 
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String username = request.getParameter("userid");
-        String password = request.getParameter("passwd");
+
+        ReqReader reader = new ReqReader(request.getInputStream());
+        ResWriter writer = new ResWriter(response.getOutputStream());
+        String username  = reader.getString("userid");
+        String password  = reader.getString("passwd");
 
         response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
 
         if (password == "" || username == "") {
-            out.println("failed");
+            writer.add("status", "failed").write();
             return;
         }
 
@@ -43,14 +45,14 @@ public class Login extends HttpServlet {
             rs = ps.executeQuery();
             if (rs.next()) {
                 if (CipherUtil.checkPassword(password, rs.getString("passwd"))) {
-                    out.println("success");
+                    writer.add("status", "success").write();
                 }
                 else {
-                    out.println("failed");
+                    writer.add("status", "failed").write();
                 }
             }
             else {
-                out.println("error");
+                writer.add("status", "error").write();
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -70,8 +72,5 @@ public class Login extends HttpServlet {
                 e.printStackTrace();
             }
         }
-
-
-
     }
 }

@@ -19,16 +19,18 @@ public class Modify extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String username = request.getParameter("userid");
-        String password = request.getParameter("passwd");
-        String newpassword = request.getParameter("newpasswd");
-        String nickname = request.getParameter("nickname");
-        String email = request.getParameter("email");
+        ReqReader reader = new ReqReader(request.getInputStream());
+        ResWriter writer = new ResWriter(response.getOutputStream());
+        String username = reader.getString("userid");
+        String password = reader.getString("passwd");
+        String newpassword = reader.getString("newpasswd");
+        String nickname = reader.getString("nickname");
+        String email = reader.getString("email");
+
         response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
 
         if (username == "" || password == "" || nickname == "") {
-            out.println("failed");
+            writer.add("status", "failed").write();
             return;
         }
 
@@ -50,14 +52,14 @@ public class Modify extends HttpServlet {
             rs = ps.executeQuery();
             if (rs.next()) {
                 if (CipherUtil.checkPassword(password, rs.getString("passwd"))) {
-                    out.println("success");
+                    writer.add("status", "success").write();
                 }
                 else {
-                    out.println("failed");
+                    writer.add("status", "failed").write();
                 }
             }
             else {
-                out.println("error");
+                writer.add("status", "error").write();
             }
             if (newpassword == "") {
                 sql = "UPDATE user_info set nikename = ?, email = ? WHERE userid = ?";
@@ -79,7 +81,7 @@ public class Modify extends HttpServlet {
                 ps2.executeUpdate();
                 ps2.close();
             }
-            out.println("success");
+            writer.add("status", "success").write();
         } catch(Exception e) {
             e.printStackTrace();
         }
