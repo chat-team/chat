@@ -30,7 +30,7 @@ app.controller("LoginCtrl", function($scope, $http, $location) {
             url: "/login",
             data: {
                 "userid": $scope.userid,
-                "password": $scope.password,
+                "passwd": $scope.password,
             },
         };
         $http(req).then(
@@ -54,7 +54,7 @@ app.controller("RegisterCtrl", function($scope, $http, $location) {
             url: "/register",
             data: {
                 "nickname": $scope.nickname,
-                "password": $scope.password,
+                "passwd": $scope.password,
                 "email": $scope.email,
             },
         };
