@@ -23,8 +23,21 @@ app.config(function ($routeProvider) {
         });
 });
 
-app.controller("HomeCtrl", function($scope) {
 
+
+app.controller("HomeCtrl", function($scope) {
+    $scope.sload = function ($event) {
+        $("#spage").children().each(function (idx) {
+            $(this).delay(100).fadeOut(100);
+        })
+        var nav = $event.currentTarget;
+        $("#" + $(nav).attr("data-page")).fadeIn(100);
+        $("#snav").children().each(function (idx) {
+            $(this).removeClass("active");
+        });
+        $(nav).addClass("active");
+        $event.preventDefault();
+    }
 });
 
 app.controller("LoginCtrl", function($scope, $http, $location) {
@@ -84,5 +97,27 @@ app.controller("RegisterCtrl", function($scope, $http, $location) {
 
 app.controller("HintCtrl", function($scope, $routeParams, $location) {
     $scope.username = $routeParams.username;
+    // Other actions.
 });
+
+
+// $(function() {
+//     $('#show-friends').click(function(e) {
+//         $("#frinds").delay(100).fadeIn(100);
+//         $("#").fadeOut(100);
+//         $('#register-form-link').removeClass('active');
+//         $(this).addClass('active');
+//         console.log("ddddddddd");
+//         e.preventDefault();
+//     });
+//     $('#register-form-link').click(function(e) {
+//         $("#register-form").delay(100).fadeIn(100);
+//         $("#login-form").fadeOut(100);
+//         $('#login-form-link').removeClass('active');
+//         $(this).addClass('active');
+//         console.log("eeeeeeeeeee");
+//         e.preventDefault();
+//     });
+// });
+
 

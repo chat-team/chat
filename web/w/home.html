@@ -1,7 +1,43 @@
-<div class="row">
-    <div class="row">
+<div class="row text-center">
+
+    <div class="col-md-3 col-sm-3">
+        <div class="row">
+            <ul id="snav" class="nav nav-tabs nav-justified">
+               <li class="active"><a href="#/home" data-page="friends" ng-click="sload($event)">Friends</a></li>
+               <li><a href="#/home" data-page="groups" ng-click="sload($event)">Groups</a></li>
+               <li><a href="#/home" data-page="rooms" ng-click="sload($event)">Rooms</a></li>
+            </ul>
+        </div>
+        <div class="row" id="spage">
+            <div id="friends" style="display: block;">
+                <span>Friends List</span>
+                <ul>
+                    <li ng-repeat="x in friends">
+                        <span>{{ x }}</span>
+                    </li>
+                </ul>
+            </div>
+            <div id="groups" style="display: none;">
+                <span>Groups List</span>
+                <ul>
+                    <li ng-repeat="x in groups">
+                        <span>{{ x }}</span>
+                    </li>
+                </ul>
+            </div>
+            <div id="rooms" style="display: none;">
+                <span>Rooms List</span>
+                <ul>
+                    <li ng-repeat="x in rooms">
+                        <span>{{ x }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8 col-sm-8">
         
     </div>
 </div>
 
-<h1 class="text-center">TODO: Homepage</h1>
