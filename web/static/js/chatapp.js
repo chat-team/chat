@@ -14,6 +14,10 @@ app.config(function ($routeProvider) {
             templateUrl: '/w/register.html',
             controller: 'RegisterCtrl',
         })
+        .when("/hint/:username/", {
+            templateUrl: '/w/hint.html',
+            controller: 'HintCtrl',
+        })
         .otherwise( {
             redirectTo: '/login',
         });
@@ -35,10 +39,15 @@ app.controller("LoginCtrl", function($scope, $http, $location) {
         };
         $http(req).then(
             function (res) {
-                $location.path("/home");
+                if (res.data['status'] === 'success') {
+                    $location.path("/home");
+                }
+                else {
+                    $scope.message = 'Login failed, please retry!';
+                }
             },
             function (res) {
-                console.log("Network Failed (Login), Retry");
+                $scope.message = 'Network outage!';
             });
     }
 });
@@ -46,27 +55,34 @@ app.controller("LoginCtrl", function($scope, $http, $location) {
 app.controller("RegisterCtrl", function($scope, $http, $location) {
     $scope.register = function () {
         if ($scope.password !== $scope.confirmpassword) {
-            console.log("Password unmatch.");
-            return false;
+            $scope.message = 'The passwords you entered must be the same!';
         }
-        var req = {
-            method: "POST",
-            url: "/register",
-            data: {
-                "nickname": $scope.nickname,
-                "passwd": $scope.password,
-                "email": $scope.email,
-            },
-        };
-        $http(req).then(
-            function (res) {
-                $location.path("/login");
-            },
-            function (res) {
-                console.log("Network Failed (Register), Retry");
-            });
+        else {
+            $http({
+                method: "POST",
+                url: "/register",
+                data: {
+                    "nickname": $scope.nickname,
+                    "passwd": $scope.password,
+                    "email": $scope.email,
+                },
+            }).then(
+                function (res) {
+                    if (res.data['status'] === 'success') {
+                        $location.path("/hint/" + res.data['username']);
+                    }
+                    else {
+                        $scope.message = 'Register failed, please retry!';
+                    }
+                },
+                function (res) {
+                    $scope.message = 'Network outage!';
+                });
+        }
     }
 });
 
-
+app.controller("HintCtrl", function($scope, $routeParams, $location) {
+    $scope.username = $routeParams.username;
+});
 
