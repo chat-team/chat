@@ -11,7 +11,7 @@ import java.io.IOException;
 public class Config {
     private static Properties prop = new Properties();
     static {
-        InputStream in = Config.class.getResourceAsStream("/chat.properities");
+        InputStream in = Config.class.getResourceAsStream("/chat.properties");
         try {
             prop.load(in);
             in.close();
