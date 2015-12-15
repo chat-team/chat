@@ -1,0 +1,7 @@
+## Database configuration.
+db.ip = localhost
+db.port = 3306
+db.name = chat
+db.user = vagrant
+db.password = vagrant
+

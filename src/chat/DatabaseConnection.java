@@ -8,9 +8,12 @@ import java.sql.DriverManager;
  */
 public class DatabaseConnection {
     private String dbDriver = "com.mysql.jdbc.Driver";
-    private String dbUrl = "jdbc:mysql://172.31.124.197:3306/chat";
-    private String dbUser = "vagrant";
-    private String dbPassword = "vagrant";
+    private String dbUrl = "jdbc:mysql://"
+            + Config.getConfig("db.ip") + ":"
+            + Config.getConfig("db.port") + "/"
+            + Config.getConfig("db.name");
+    private String dbUser = Config.getConfig("db.user");
+    private String dbPassword = Config.getConfig("db.password");
 
     public Connection getConnection() {
         Connection conn = null;
