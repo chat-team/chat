@@ -27,8 +27,6 @@ public class Modify extends HttpServlet {
         String nickname = reader.getString("nickname");
         String email = reader.getString("email");
 
-        response.setContentType("text/html");
-
         if (username == "" || password == "" || nickname == "") {
             writer.add("status", "failed").write();
             return;
