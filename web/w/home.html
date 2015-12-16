@@ -1,6 +1,6 @@
 <div class="row text-center">
     <div class="panel panel-default panel-home col-md-12 col-sm-12 fill">
-        <div class="col-md-3 col-sm-3 panel panel-home">
+        <div class="col-md-3 col-sm-3 panel panel-home" ng-init="sinit()">
             <div class="row panel-heading">
                 <ul id="snav" class="nav nav-tabs nav-justified">
                    <li class="active"><a href="#/home" data-page="friends" ng-click="sload($event)">Friends</a></li>
@@ -12,10 +12,13 @@
                 <div id="friends" style="display: block;">
                     <ul class="list-group text-center">
                         <li class="list-group-item text-center">
-                            <input type="text" ng-model="target_friend" placeholder="new friend" class="form-control">
+                            <input type="text" ng-model="target_friend" placeholder="new friend" class="form-control" ng-change="searchFriends(this)">
                         </li>
-                        <li class="list-group-item" ng-repeat="x in ['dd', 'e', 'fff']">
-                            <span>{{ x }}</span>
+                        <li class="list-group-item" ng-repeat="x in searched_friends">
+                            <span>{{ x.name }}</span><span>{{ x.id }}</span>
+                        </li>
+                        <li class="list-group-item" ng-repeat="x in friends">
+                            <span>{{ x.name }}</span><span>{{ x.id }}</span>
                         </li>
                     </ul>
                 </div>
@@ -26,17 +29,18 @@
                                 <a data-toggle="collapse" data-parent="#accordion" href="#admined-groups" target="_self" >Admined Groups</a>
                             </div>
                             <div id="admined-groups" class="panel-collapse collapse in">
-                                <div class="panel-collapse collapse in" id="admined-groups">
-                                    <div class="panel-body">
-                                        <ul class="list-group text-center">
-                                            <li class="list-group-item text-center">
-                                                <input type="text" ng-model="target_group" placeholder="new group" class="form-control">
-                                            </li>
-                                            <li class="list-group-item" ng-repeat="x in ['ddd', 'eeee', 'fff']">
-                                                <span>{{ x }}</span>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                <div class="panel-body">
+                                    <ul class="list-group text-center">
+                                        <li class="list-group-item text-center">
+                                            <form action="#" method="post" onsubmit="return false;" ng-click="createGroup()">
+                                                <!--<span class="glyphicon glyphicon-plus"></span>-->
+                                                <input type="text" ng-model="target_create_group" placeholder="new group" class="form-control">
+                                            </form>
+                                        </li>
+                                        <li class="list-group-item text-center" ng-repeat="x in admin_groups" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}">
+                                            <strong class="text-center">{{x.groupname}}</strong>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
@@ -48,10 +52,12 @@
                                 <div class="panel-body">
                                     <ul class="list-group text-center">
                                         <li class="list-group-item text-center">
-                                            <input type="text" ng-model="target_group" placeholder="new group" class="form-control">
+                                            <form action="#" method="post" onsubmit="return false;" ng-click="JoinedGroup()">
+                                                <input type="text" ng-model="target_join_group" placeholder="new group" class="form-control">
+                                            </form>
                                         </li>
-                                        <li class="list-group-item" ng-repeat="x in ['ddd', 'eeee', 'fff']">
-                                            <span>{{ x }}</span>
+                                        <li class="list-group-item text-center" ng-repeat="x in joined_groups" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}">
+                                            <strong class="text-center">{{x.groupname}}</strong>
                                         </li>
                                     </ul>
                                 </div>
@@ -62,10 +68,12 @@
                 <div id="rooms" style="display: none;">
                     <ul class="list-group text-center">
                         <li class="list-group-item text-center">
-                            <input type="text" ng-model="target_rom" placeholder="new room" class="form-control">
+                            <form action="#" method="post" onsubmit="return false;" ng-click="createRoom()">
+                                <input type="text" ng-model="target_rom" placeholder="new room" class="form-control">
+                            </form>
                         </li>
-                        <li class="list-group-item" ng-repeat="x in ['r1', 'r2', 'r3']">
-                            <span>{{ x }}</span>
+                        <li class="list-group-item" ng-repeat="x in rooms">
+                            <span class="label label-default text-right">{{ x.groupid }}</span><strong>{{ x.groupname }}</strong>
                         </li>
                     </ul>
                 </div>
@@ -74,7 +82,28 @@
         
         <div class="col-md-9 col-sm-9 panel panel-home">
             <div style="height: 640px;">
+                <div style="height: 600px;">
+                    <form role="form">
+                        <div ng-repeat="log in [{sender: 'A', message: 'dddd'}, {sender: 'B', message: 'eeee'}, {sender: 'C', message: 'ffff'}]">
+                            <br />
+                            <div class="input-group">
+                                <span class="input-group-addon">{{ log.sender }}</span>
+                                <input type="text" class="form-control" placeholder="" value="{{ log.message }}">
+                            </div>
+                        </div>
+                    </form>
+                </div>
                 
+                <div>
+                    <form action="#" method="post" onsubmit="return false;" style="padding-bottom: 0px;">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="nextmsg" ng-model="message" value="" placeholder="Message">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" ng-click="sendit()">Send</button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

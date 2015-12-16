@@ -1,4 +1,4 @@
-var app = angular.module("chatApp", ['ngRoute', 'ngAnimate']);
+var app = angular.module("chatApp", ['ngRoute', 'ui.bootstrap', 'ngAnimate']);
 
 app.config(function ($routeProvider) {
     $routeProvider
@@ -52,7 +52,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
         $event.preventDefault();
     };
 
-    $scope.queryGroup = function ($scope) {
+    $scope.queryGroup = function () {
         var req = {
             method: "POST",
             url: "/querygroup",
@@ -60,7 +60,8 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
         };
         $http(req).then(
             function (res) {
-                console.log(res);
+                $scope.admin_groups = res.data.group;
+                $("[data-toggle='tooltip']").tooltip();
             },
             function (res) {
                 console.log("ERROR");
@@ -68,11 +69,11 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
         );
     };
 
-    $scope.queryFriend = function ($scope) {
+    $scope.queryFriend = function () {
 
     };
 
-    $scope.queryChatRoom = function ($scope) {
+    $scope.queryChatRoom = function () {
         var req = {
             method: "POST",
             url: "/querychatroom",
@@ -88,8 +89,56 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
         );
     };
 
-    $scope.queryGroup($scope);
-    $scope.queryChatRoom($scope);
+    $scope.createRoom = function () {
+        var req = {
+            method: "POST",
+            url: "/constructchatroom",
+            data: {
+                "roomname": $scope.target_create_group,
+                "description": "description of " + $scope.target_create_group,
+            },
+        };
+        $http(req).then(
+            function (res) {
+                console.log(res);
+            },
+            function (res) {
+                console.log("ERROR");
+            }
+        );
+    };
+
+    $scope.createGroup = function () {
+        var req = {
+            method: "POST",
+            url: "/constructgroup",
+            data: {
+                "groupname": $scope.target_create_group,
+                "description": "description of " + $scope.target_create_group,
+            },
+        };
+        $http(req).then(
+            function (res) {
+                console.log(res);
+            },
+            function (res) {
+                console.log("ERROR");
+            }
+        );
+    };
+
+    $scope.searchFriends = function (dom) {
+        $scope.searched_friends = ["ddd", "eee", "fff"];
+    };
+
+    $scope.sendit = function () {
+        console.log($scope.message);
+    }
+
+    $scope.sinit = function () {
+        $scope.queryGroup();
+        $scope.queryChatRoom();
+    };
 });
 
 app.controller("LoginCtrl", function ($scope, $http, $location) {
@@ -113,7 +162,8 @@ app.controller("LoginCtrl", function ($scope, $http, $location) {
             },
             function (res) {
                 $scope.message = 'Network outage!';
-            });
+            }
+        );
     }
 });
 
@@ -142,7 +192,8 @@ app.controller("RegisterCtrl", function ($scope, $http, $location) {
                 },
                 function (res) {
                     $scope.message = 'Network outage!';
-                });
+                }
+            );
         }
     }
 });
@@ -151,6 +202,5 @@ app.controller("HintCtrl", function ($scope, $routeParams, $location) {
     $scope.username = $routeParams.username;
     // Other actions.
 });
-
 
 
