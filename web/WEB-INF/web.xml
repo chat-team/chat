@@ -87,4 +87,28 @@
         <url-pattern>/constructgroup</url-pattern>
     </servlet-mapping>
 
+    <!-- querygroup -->
+    <servlet>
+        <servlet-name>querygroup</servlet-name>
+        <servlet-class>chat.QueryGroup</servlet-class>
+    </servlet>
+
+    <!-- querygroup servlet -->
+    <servlet-mapping>
+        <servlet-name>querygroup</servlet-name>
+        <url-pattern>/querygroup</url-pattern>
+    </servlet-mapping>
+
+    <!-- querychatroom -->
+    <servlet>
+        <servlet-name>querychatroom</servlet-name>
+        <servlet-class>chat.QueryChatroom</servlet-class>
+    </servlet>
+
+    <!-- querychatroom servlet -->
+    <servlet-mapping>
+        <servlet-name>querychatroom</servlet-name>
+        <url-pattern>/querychatroom</url-pattern>
+    </servlet-mapping>
+
 </web-app>
