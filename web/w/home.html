@@ -1,43 +1,82 @@
 <div class="row text-center">
-
-    <div class="col-md-3 col-sm-3">
-        <div class="row">
-            <ul id="snav" class="nav nav-tabs nav-justified">
-               <li class="active"><a href="#/home" data-page="friends" ng-click="sload($event)">Friends</a></li>
-               <li><a href="#/home" data-page="groups" ng-click="sload($event)">Groups</a></li>
-               <li><a href="#/home" data-page="rooms" ng-click="sload($event)">Rooms</a></li>
-            </ul>
+    <div class="panel panel-default panel-home col-md-12 col-sm-12 fill">
+        <div class="col-md-3 col-sm-3 panel panel-home">
+            <div class="row panel-heading">
+                <ul id="snav" class="nav nav-tabs nav-justified">
+                   <li class="active"><a href="#/home" data-page="friends" ng-click="sload($event)">Friends</a></li>
+                   <li><a href="#/home" data-page="groups" ng-click="sload($event)">Groups</a></li>
+                   <li><a href="#/home" data-page="rooms" ng-click="sload($event)">Rooms</a></li>
+                </ul>
+            </div>
+            <div class="row" id="spage">
+                <div id="friends" style="display: block;">
+                    <ul class="list-group text-center">
+                        <li class="list-group-item text-center">
+                            <input type="text" ng-model="target_friend" placeholder="new friend" class="form-control">
+                        </li>
+                        <li class="list-group-item" ng-repeat="x in ['dd', 'e', 'fff']">
+                            <span>{{ x }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div id="groups" style="display: none;">
+                    <div class="panel-group" id="accordion">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#admined-groups" target="_self" >Admined Groups</a>
+                            </div>
+                            <div id="admined-groups" class="panel-collapse collapse in">
+                                <div class="panel-collapse collapse in" id="admined-groups">
+                                    <div class="panel-body">
+                                        <ul class="list-group text-center">
+                                            <li class="list-group-item text-center">
+                                                <input type="text" ng-model="target_group" placeholder="new group" class="form-control">
+                                            </li>
+                                            <li class="list-group-item" ng-repeat="x in ['ddd', 'eeee', 'fff']">
+                                                <span>{{ x }}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#joined-groups" target="_self">Joined Groups</a>
+                            </div>
+                            <div id="joined-groups" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <ul class="list-group text-center">
+                                        <li class="list-group-item text-center">
+                                            <input type="text" ng-model="target_group" placeholder="new group" class="form-control">
+                                        </li>
+                                        <li class="list-group-item" ng-repeat="x in ['ddd', 'eeee', 'fff']">
+                                            <span>{{ x }}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="rooms" style="display: none;">
+                    <ul class="list-group text-center">
+                        <li class="list-group-item text-center">
+                            <input type="text" ng-model="target_rom" placeholder="new room" class="form-control">
+                        </li>
+                        <li class="list-group-item" ng-repeat="x in ['r1', 'r2', 'r3']">
+                            <span>{{ x }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div class="row" id="spage">
-            <div id="friends" style="display: block;">
-                <span>Friends List</span>
-                <ul>
-                    <li ng-repeat="x in friends">
-                        <span>{{ x }}</span>
-                    </li>
-                </ul>
-            </div>
-            <div id="groups" style="display: none;">
-                <span>Groups List</span>
-                <ul>
-                    <li ng-repeat="x in groups">
-                        <span>{{ x }}</span>
-                    </li>
-                </ul>
-            </div>
-            <div id="rooms" style="display: none;">
-                <span>Rooms List</span>
-                <ul>
-                    <li ng-repeat="x in rooms">
-                        <span>{{ x }}</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-8 col-sm-8">
         
+        <div class="col-md-9 col-sm-9 panel panel-home">
+            <div style="height: 640px;">
+                
+            </div>
+        </div>
     </div>
 </div>
 
