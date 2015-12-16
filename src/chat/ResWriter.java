@@ -1,10 +1,8 @@
 package chat;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonWriter;
+import javax.json.*;
 import java.io.OutputStream;
+import java.util.List;
 
 /**
  * Created by He Tao on 2015/12/15.
@@ -12,6 +10,7 @@ import java.io.OutputStream;
 public final class ResWriter {
     private JsonWriter writer;
     private JsonObjectBuilder builder;
+
     public ResWriter(OutputStream output) {
         this.writer = Json.createWriter(output);
         this.builder = Json.createObjectBuilder();
@@ -30,4 +29,15 @@ public final class ResWriter {
         this.builder.add(key, value);
         return this;
     }
+
+    public  ResWriter add(String key, List<String> element) {
+        JsonArrayBuilder arraybuilder;
+        arraybuilder = Json.createArrayBuilder();
+        for (int i = 0; i < element.size(); ++i) {
+            arraybuilder.add(element.get(i));
+        }
+        this.builder.add(key, arraybuilder);
+        return this;
+    }
+
 }
