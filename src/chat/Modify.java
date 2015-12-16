@@ -56,7 +56,6 @@ public class Modify extends HttpServlet {
                 writer.add("status", "error").write();
                 return;
             }
-            System.out.println("NEW: " + newpassword);
             if (newpassword.equals("")) {
                 sql = "UPDATE user_info set nickname = ?, email = ? WHERE userid = ?";
                 ps = conn.prepareStatement(sql);
@@ -64,7 +63,6 @@ public class Modify extends HttpServlet {
                 ps.setObject(1, nickname);
                 ps.setObject(2, email);
                 ps.executeUpdate();
-                writer.add("modifywithoutpasswd", "success").write();
             }else{
                 newpassword = CipherUtil.encoderByMd5(newpassword);
                 sql = "UPDATE user_info set passwd = ?, nickname = ?, email = ? WHERE userid = ?";
@@ -74,8 +72,8 @@ public class Modify extends HttpServlet {
                 ps.setObject(1, newpassword);
                 ps.setObject(3, email);
                 ps.executeUpdate();
-                writer.add("modify", "success").write();
             }
+            writer.add("modify", "success").write();
         } catch(Exception e) {
             e.printStackTrace();
         }
