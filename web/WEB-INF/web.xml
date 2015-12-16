@@ -63,4 +63,28 @@
         <url-pattern>/modify</url-pattern>
     </servlet-mapping>
 
+    <!-- constructchatroom -->
+    <servlet>
+        <servlet-name>constructchatroom</servlet-name>
+        <servlet-class>chat.ConstructChatroom</servlet-class>
+    </servlet>
+
+    <!-- constructchatroom servlet -->
+    <servlet-mapping>
+        <servlet-name>constructchatroom</servlet-name>
+        <url-pattern>/constructchatroom</url-pattern>
+    </servlet-mapping>
+
+    <!-- constructgroup -->
+    <servlet>
+        <servlet-name>constructgroup</servlet-name>
+        <servlet-class>chat.ConstructGroup</servlet-class>
+    </servlet>
+
+    <!-- constructgroup servlet -->
+    <servlet-mapping>
+        <servlet-name>constructgroup</servlet-name>
+        <url-pattern>/constructgroup</url-pattern>
+    </servlet-mapping>
+
 </web-app>
