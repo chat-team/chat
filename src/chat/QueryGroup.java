@@ -43,7 +43,7 @@ public class QueryGroup extends HttpServlet {
 
         DatabaseConnection dbConn = new DatabaseConnection();
         Connection conn = dbConn.getConnection();
-        String sql = "SELECT groupid FROM group_belong WHERE userid = ?";
+        String sql = "SELECT group_belong.groupid, groupname FROM group_belong, group_info WHERE group_belong.groupid = group_info.groupid and userid = ?";
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
@@ -52,7 +52,8 @@ public class QueryGroup extends HttpServlet {
             rs = ps.executeQuery();
             ArrayList<String> array = new ArrayList<String>();
             while (rs.next()) {
-                array.add(rs.getString(1));
+                array.add(rs.getString("groupid"));
+                array.add(rs.getString("groupname"));
             }
             writer.add("status", "success");
             writer.add("group", array).write();

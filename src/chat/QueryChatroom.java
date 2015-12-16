@@ -41,7 +41,7 @@ public class QueryChatroom extends HttpServlet {
 
         DatabaseConnection dbConn = new DatabaseConnection();
         Connection conn = dbConn.getConnection();
-        String sql = "SELECT roomid FROM room_status WHERE userid = ?";
+        String sql = "SELECT room_status.roomid, roomname FROM room_status, chatroom WHERE room_status.roomid = chatroom.roomid and userid = ?";
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
@@ -50,7 +50,8 @@ public class QueryChatroom extends HttpServlet {
             rs = ps.executeQuery();
             ArrayList<String> array = new ArrayList<String>();
             while (rs.next()) {
-                array.add(rs.getString(1));
+                array.add(rs.getString("roomid"));
+                array.add(rs.getString("roomname"));
             }
             writer.add("status", "success");
             writer.add("chat", array).write();

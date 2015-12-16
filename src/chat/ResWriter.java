@@ -33,8 +33,11 @@ public final class ResWriter {
     public  ResWriter add(String key, List<String> element) {
         JsonArrayBuilder arraybuilder;
         arraybuilder = Json.createArrayBuilder();
-        for (int i = 0; i < element.size(); ++i) {
-            arraybuilder.add(element.get(i));
+        for (int i = 0; i < element.size(); i += 2) {
+            JsonObjectBuilder t  = Json.createObjectBuilder();;
+            t.add("groupid", element.get(i));
+            t.add("groupname", element.get(i + 1));
+            arraybuilder.add(t);
         }
         this.builder.add(key, arraybuilder);
         return this;
