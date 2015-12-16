@@ -23,9 +23,22 @@ app.config(function ($routeProvider) {
         });
 });
 
+app.factory('RedirectInterceptor',['$q','$location', function ($q, $location) {
+    return {
+        responseError: function (res) {
+            if (res.status === 401) {
+                $location.path('/');
+            }
+            return $q.reject(res);
+        },
+    }
+}]);
+//Http Intercpetor to check auth failures for xhr requests
+app.config(function ($httpProvider) {
+    $httpProvider.interceptors.push('RedirectInterceptor');
+});
 
-
-app.controller("HomeCtrl", function($scope) {
+app.controller("HomeCtrl", function ($scope, $http, $location) {
     $scope.sload = function ($event) {
         $("#spage").children().each(function (idx) {
             $(this).delay(100).fadeOut(100);
@@ -37,10 +50,49 @@ app.controller("HomeCtrl", function($scope) {
         });
         $(nav).addClass("active");
         $event.preventDefault();
-    }
+    };
+
+    $scope.queryGroup = function ($scope) {
+        var req = {
+            method: "POST",
+            url: "/querygroup",
+            data: { },
+        };
+        $http(req).then(
+            function (res) {
+                console.log(res);
+            },
+            function (res) {
+                console.log("ERROR");
+            }
+        );
+    };
+
+    $scope.queryFriend = function ($scope) {
+
+    };
+
+    $scope.queryChatRoom = function ($scope) {
+        var req = {
+            method: "POST",
+            url: "/querychatroom",
+            data: { },
+        };
+        $http(req).then(
+            function (res) {
+                console.log(res);
+            },
+            function (res) {
+                console.log("ERROR");
+            }
+        );
+    };
+
+    $scope.queryGroup($scope);
+    $scope.queryChatRoom($scope);
 });
 
-app.controller("LoginCtrl", function($scope, $http, $location) {
+app.controller("LoginCtrl", function ($scope, $http, $location) {
     $scope.login = function () {
         var req = {
             method: "POST",
@@ -65,7 +117,7 @@ app.controller("LoginCtrl", function($scope, $http, $location) {
     }
 });
 
-app.controller("RegisterCtrl", function($scope, $http, $location) {
+app.controller("RegisterCtrl", function ($scope, $http, $location) {
     $scope.register = function () {
         if ($scope.password !== $scope.confirmpassword) {
             $scope.message = 'The passwords you entered must be the same!';
@@ -95,7 +147,7 @@ app.controller("RegisterCtrl", function($scope, $http, $location) {
     }
 });
 
-app.controller("HintCtrl", function($scope, $routeParams, $location) {
+app.controller("HintCtrl", function ($scope, $routeParams, $location) {
     $scope.username = $routeParams.username;
     // Other actions.
 });

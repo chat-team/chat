@@ -27,6 +27,9 @@ public class Login extends HttpServlet {
         String username  = reader.getString("userid");
         String password  = reader.getString("passwd");
 
+        HttpSession session = request.getSession();
+        session.setMaxInactiveInterval(60);
+
         if (password == "" || username == "") {
             writer.add("status", "failed").write();
             return;
@@ -43,6 +46,7 @@ public class Login extends HttpServlet {
             rs = ps.executeQuery();
             if (rs.next()) {
                 if (CipherUtil.checkPassword(password, rs.getString("passwd"))) {
+                    session.setAttribute("userid", username);
                     writer.add("status", "success").write();
                 }
                 else {
