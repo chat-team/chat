@@ -9,7 +9,7 @@ create table user_info (
 	userid integer primary key not null,
     nickname varchar(30) not null,
     passwd varchar(32) not null,
-    email varchar(20)
+    email varchar(20) not null
 ) engine=innodb, charset=utf8;
 
 create table group_info (
@@ -37,7 +37,7 @@ create table noteboard (
 ) engine=innodb, charset=utf8;
 
 create table chatroom (
-	roomid integer primary key not null,
+	roomid integer primary key not null auto_increment,
 	roomname varchar(30) not null,
     description varchar(50)
 ) engine=innodb, charset=utf8;
