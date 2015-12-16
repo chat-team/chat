@@ -34,17 +34,10 @@ public class Modify extends HttpServlet {
             return;
         }
 
-        try {
-            newpassword = CipherUtil.encoderByMd5(newpassword);
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-
         DatabaseConnection dbConn = new DatabaseConnection();
         Connection conn = dbConn.getConnection();
         String sql = "SELECT * FROM user_info WHERE userid = ?";
         PreparedStatement ps = null;
-        PreparedStatement ps1 = null, ps2 = null;
         ResultSet rs = null;
         try {
             ps = conn.prepareStatement(sql);
@@ -52,36 +45,37 @@ public class Modify extends HttpServlet {
             rs = ps.executeQuery();
             if (rs.next()) {
                 if (CipherUtil.checkPassword(password, rs.getString("passwd"))) {
-                    writer.add("status", "success").write();
+                    writer.add("status", "success");
                 }
                 else {
                     writer.add("status", "failed").write();
+                    return;
                 }
             }
             else {
                 writer.add("status", "error").write();
+                return;
             }
-            if (newpassword == "") {
-                sql = "UPDATE user_info set nikename = ?, email = ? WHERE userid = ?";
-                ps1 = conn.prepareStatement(sql);
-                ps1.setObject(3, username);
-                ps1.setObject(1, nickname);
-                ps1.setObject(2, email);
-                ps1.executeUpdate();
-                ps1.close();
+            System.out.println("NEW: " + newpassword);
+            if (newpassword.equals("")) {
+                sql = "UPDATE user_info set nickname = ?, email = ? WHERE userid = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setObject(3, username);
+                ps.setObject(1, nickname);
+                ps.setObject(2, email);
+                ps.executeUpdate();
+                writer.add("modifywithoutpasswd", "success").write();
+            }else{
+                newpassword = CipherUtil.encoderByMd5(newpassword);
+                sql = "UPDATE user_info set passwd = ?, nickname = ?, email = ? WHERE userid = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setObject(4, username);
+                ps.setObject(2, nickname);
+                ps.setObject(1, newpassword);
+                ps.setObject(3, email);
+                ps.executeUpdate();
+                writer.add("modify", "success").write();
             }
-            ps.clearParameters();
-            if (newpassword != "") {
-                sql = "UPDATE user_info set passwd = ?, nikename = ?, email = ? WHERE userid = ?";
-                ps2 = conn.prepareStatement(sql);
-                ps2.setObject(4, username);
-                ps2.setObject(2, nickname);
-                ps2.setObject(1, newpassword);
-                ps2.setObject(3, email);
-                ps2.executeUpdate();
-                ps2.close();
-            }
-            writer.add("status", "success").write();
         } catch(Exception e) {
             e.printStackTrace();
         }

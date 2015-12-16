@@ -27,8 +27,6 @@ public class Login extends HttpServlet {
         String username  = reader.getString("userid");
         String password  = reader.getString("passwd");
 
-        response.setContentType("text/html");
-
         if (password == "" || username == "") {
             writer.add("status", "failed").write();
             return;

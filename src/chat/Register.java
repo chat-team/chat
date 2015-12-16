@@ -26,8 +26,6 @@ public class Register extends HttpServlet {
         String nickname = reader.getString("nickname");
         String email = reader.getString("email");
 
-        response.setContentType("text/html");
-
         if (password == "" || nickname == "") {
             writer.add("status", "failed").write();
             return;
