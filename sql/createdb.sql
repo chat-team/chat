@@ -20,7 +20,7 @@ create table group_info (
 ) engine=innodb, charset=utf8;
 
 create table message (
-	messageid integer primary key not null auto_increment,
+	messageid integer primary key not null,
     ctime datetime not null,
     content varchar(100) not null,
     state bool not null
