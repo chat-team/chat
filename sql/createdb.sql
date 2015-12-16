@@ -104,5 +104,9 @@ create table board_belong (
     primary key (boardid, roomid)
 ) engine=innodb, charset=utf8;
 
-
-
+create trigger add_group
+after insert on group_info
+for each row
+begin
+    insert into group_belong (groupid, userid) values (new.groupid, new.admin);
+end;
