@@ -17,10 +17,12 @@ public final class ReqReader {
     }
 
     public String getString(String key) {
+
         return this.content.getString(key);
     }
 
     public int getInt(String key) {
+
         return this.content.getInt(key);
     }
 }

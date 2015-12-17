@@ -20,9 +20,10 @@ create table group_info (
 ) engine=innodb, charset=utf8;
 
 create table message (
-	messageid integer primary key not null,
+	messageid integer primary key not null auto_increment,
     ctime datetime not null,
     content varchar(100) not null,
+    userid integer not null,
     state bool not null
 ) engine=innodb, charset=utf8;
 
@@ -66,12 +67,6 @@ create table chat_record (
     userbid integer not null,
     messageid integer not null,
     primary key (useraid, userbid, messageid)
-) engine=innodb, charset=utf8;
-
-create table message_record (
-	userid integer not null,
-    messageid integer not null,
-    primary key (userid, messageid)
 ) engine=innodb, charset=utf8;
 
 create table group_belong (
