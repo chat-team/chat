@@ -11,7 +11,7 @@ import java.util.Set;
  * Created by Dongfang on 2015/12/17.
  */
 @ServerEndpoint(
-        value = "",
+        value = "/chatroom",
         encoders = { MessageEncoder.class },
         decoders = { MessageDecoder.class }
 )

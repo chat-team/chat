@@ -48,7 +48,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
         $("#snav").children().each(function (idx) {
             $(this).removeClass("active");
         });
-        $(nav).addClass("active");
+        $(nav).parent().addClass("active");
         $event.preventDefault();
     };
 
@@ -61,7 +61,6 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
         $http(req).then(
             function (res) {
                 $scope.admin_groups = res.data.group;
-                $("[data-toggle='tooltip']").tooltip();
             },
             function (res) {
                 console.log("ERROR");
@@ -81,7 +80,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
         };
         $http(req).then(
             function (res) {
-                console.log(res);
+                
             },
             function (res) {
                 console.log("ERROR");
@@ -94,18 +93,20 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
             method: "POST",
             url: "/constructchatroom",
             data: {
-                "roomname": $scope.target_create_group,
-                "description": "description of " + $scope.target_create_group,
+                "roomname": $scope.target_create_room,
+                "description": "description of " + $scope.target_create_room,
             },
         };
-        $http(req).then(
-            function (res) {
-                console.log(res);
-            },
-            function (res) {
-                console.log("ERROR");
-            }
-        );
+        if ($scope.target_create_room && $scope.target_create_room.length > 0) {
+            $http(req).then(
+                function (res) {
+                    $scope.queryChatRoom();
+                },
+                function (res) {
+                    console.log("ERROR");
+                }
+            );
+        }
     };
 
     $scope.createGroup = function () {
@@ -119,7 +120,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
         };
         $http(req).then(
             function (res) {
-                console.log(res);
+                $scope.queryGroup();
             },
             function (res) {
                 console.log("ERROR");
@@ -128,7 +129,17 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
     };
 
     $scope.searchFriends = function (dom) {
-        $scope.searched_friends = ["ddd", "eee", "fff"];
+        if (!$scope.target_friend || $scope.target_friend.length <= 0) {
+            $scope.searched_friends = [];
+        }
+        else {
+            $scope.searched_friends = [
+                { userid: "1", username: "eee"},
+                { userid: "2", username: "dddd"},
+                { userid: "3", username: "fff"},
+            ];
+            console.log($scope.searched_friends);
+        }
     };
 
     $scope.sendit = function () {

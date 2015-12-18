@@ -1,6 +1,6 @@
 <div class="row text-center">
     <div class="panel panel-default panel-home col-md-12 col-sm-12 fill">
-        <div class="col-md-3 col-sm-3 panel panel-home" ng-init="sinit()">
+        <div class="col-md-3 col-sm-3 panel panel-home" ng-init="sinit()" style="height: 640px;">
             <div class="row panel-heading">
                 <ul id="snav" class="nav nav-tabs nav-justified">
                    <li class="active"><a href="#/home" data-page="friends" ng-click="sload($event)">Friends</a></li>
@@ -14,11 +14,14 @@
                         <li class="list-group-item text-center">
                             <input type="text" ng-model="target_friend" placeholder="new friend" class="form-control" ng-change="searchFriends(this)">
                         </li>
-                        <li class="list-group-item" ng-repeat="x in searched_friends">
+                        <li class="list-group-item" ng-repeat="x in searched_friends" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-gid="{{ x.groupid }}">
                             <span>{{ x.name }}</span><span>{{ x.id }}</span>
                         </li>
-                        <li class="list-group-item" ng-repeat="x in friends">
-                            <span>{{ x.name }}</span><span>{{ x.id }}</span>
+                        <li class="list-group-item" ng-repeat="x in friends" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-fid="{{ x.userid }}">
+                            <span>{{ x }}</span><span>{{ x.userid }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <span class="glyphicon glyphicon-plus"></span>
                         </li>
                     </ul>
                 </div>
@@ -35,9 +38,10 @@
                                             <form action="#" method="post" onsubmit="return false;" ng-click="createGroup()">
                                                 <!--<span class="glyphicon glyphicon-plus"></span>-->
                                                 <input type="text" ng-model="target_create_group" placeholder="new group" class="form-control">
+                                                <span ng-bind="target_create_group"></span>
                                             </form>
                                         </li>
-                                        <li class="list-group-item text-center" ng-repeat="x in admin_groups" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}">
+                                        <li class="list-group-item text-center" ng-repeat="x in admin_groups" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-gid="{{ x.groupid }}">
                                             <strong class="text-center">{{x.groupname}}</strong>
                                         </li>
                                     </ul>
@@ -56,7 +60,7 @@
                                                 <input type="text" ng-model="target_join_group" placeholder="new group" class="form-control">
                                             </form>
                                         </li>
-                                        <li class="list-group-item text-center" ng-repeat="x in joined_groups" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}">
+                                        <li class="list-group-item text-center" ng-repeat="x in joined_groups" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-gid="{{ x.groupid }}">
                                             <strong class="text-center">{{x.groupname}}</strong>
                                         </li>
                                     </ul>
@@ -69,11 +73,11 @@
                     <ul class="list-group text-center">
                         <li class="list-group-item text-center">
                             <form action="#" method="post" onsubmit="return false;" ng-click="createRoom()">
-                                <input type="text" ng-model="target_rom" placeholder="new room" class="form-control">
+                                <input type="text" ng-model="target_create_room" placeholder="new room" class="form-control">
                             </form>
                         </li>
-                        <li class="list-group-item" ng-repeat="x in rooms">
-                            <span class="label label-default text-right">{{ x.groupid }}</span><strong>{{ x.groupname }}</strong>
+                        <li class="list-group-item" ng-repeat="x in rooms"  data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.roomid }}" data-rid="{{ x.roomid }}">
+                            <span class="label label-default text-right">{{ x.roomid }}</span><strong>{{ x.roomid }}</strong>
                         </li>
                     </ul>
                 </div>
