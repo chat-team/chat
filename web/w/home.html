@@ -1,29 +1,54 @@
 <div class="row text-center">
     <div class="panel panel-default panel-home col-md-12 col-sm-12 fill">
-        <div class="col-md-3 col-sm-3 panel panel-home" ng-init="sinit()" style="height: 640px;">
+        <div class="col-md-3 col-sm-3 panel panel-home" ng-init="init.Initial()" style="height: 640px;">
             <div class="row panel-heading">
                 <ul id="snav" class="nav nav-tabs nav-justified">
-                   <li class="active"><a href="#/home" data-page="friends" ng-click="sload($event)">Friends</a></li>
-                   <li><a href="#/home" data-page="groups" ng-click="sload($event)">Groups</a></li>
-                   <li><a href="#/home" data-page="rooms" ng-click="sload($event)">Rooms</a></li>
+                   <li class="active"><a href="#/home" data-page="friends" ng-click="init.Toggle($event)">Friends</a></li>
+                   <li><a href="#/home" data-page="groups" ng-click="init.Toggle($event)">Groups</a></li>
+                   <li><a href="#/home" data-page="rooms" ng-click="init.Toggle($event)">Rooms</a></li>
                 </ul>
             </div>
             <div class="row" id="spage">
                 <div id="friends" style="display: block;">
                     <ul class="list-group text-center">
                         <li class="list-group-item text-center">
-                            <input type="text" ng-model="target_friend" placeholder="new friend" class="form-control" ng-change="searchFriends(this)">
+                            <input type="text" ng-model="friend.find" placeholder="new friend" class="form-control" ng-change="friend.Search(this)">
                         </li>
-                        <li class="list-group-item" ng-repeat="x in searched_friends" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-gid="{{ x.groupid }}">
-                            <span>{{ x.name }}</span><span>{{ x.id }}</span>
+                        <li class="list-group-item" ng-repeat="x in friend.search" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.userid }}" data-gid="{{ x.userid }}">
+                            <span>{{ x.nickname }}</span>
                         </li>
-                        <li class="list-group-item" ng-repeat="x in friends" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-fid="{{ x.userid }}">
-                            <span>{{ x }}</span><span>{{ x.userid }}</span>
+                        <li class="list-group-item" ng-repeat="x in friend.all" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.userid }}" data-id="{{ x.userid }}" ng-click="chat.SetContext($event)">
+                            <span>{{ x.nickname }}</span>
                         </li>
-                        <li class="list-group-item">
+                        <li class="list-group-item" data-toggle="modal" data-target="#make_friends_modal">
                             <span class="glyphicon glyphicon-plus"></span>
                         </li>
                     </ul>
+                    <div class="modal fade" id="make_friends_modal" tabindex="-1", role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times</button>
+                                    <h4 class="modal-title">Make Friends</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form class="form" role="form" action="#" method="post" accept-charset="utf-8" onsubmit="return false;" ng-submit="friend.MakeF()">
+                                        <div class="form-group">
+                                            <input class="form-control" type="text" value="{{ friend.find }}" placeholder="Friend ID" ng-model="friend.targetid">
+                                        </div>
+                                        <div class="form-group btn-group btn-group-justified" role="group">
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="from-control btn btn-default" data-dismiss="modal">Cancel</button>
+                                            </div>
+                                            <div class="btn-group" role="group">
+                                                <button type="submit" class="from-control btn btn-primary">Send</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div id="groups" style="display: none;">
                     <div class="panel-group" id="accordion">
@@ -35,14 +60,13 @@
                                 <div class="panel-body">
                                     <ul class="list-group text-center">
                                         <li class="list-group-item text-center">
-                                            <form action="#" method="post" onsubmit="return false;" ng-click="createGroup()">
+                                            <form action="#" method="post" onsubmit="return false;" ng-submit="group.Create()">
                                                 <!--<span class="glyphicon glyphicon-plus"></span>-->
-                                                <input type="text" ng-model="target_create_group" placeholder="new group" class="form-control">
-                                                <span ng-bind="target_create_group"></span>
+                                                <input type="text" ng-model="group.create" placeholder="create new group" class="form-control">
                                             </form>
                                         </li>
-                                        <li class="list-group-item text-center" ng-repeat="x in admin_groups" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-gid="{{ x.groupid }}">
-                                            <strong class="text-center">{{x.groupname}}</strong>
+                                        <li class="list-group-item text-center" ng-repeat="x in group.admined" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-id="{{ x.groupid }}" ng-click="chat.SetContext($event)">
+                                            <strong class="text-center">{{ x.groupname }}</strong>
                                         </li>
                                     </ul>
                                 </div>
@@ -56,11 +80,11 @@
                                 <div class="panel-body">
                                     <ul class="list-group text-center">
                                         <li class="list-group-item text-center">
-                                            <form action="#" method="post" onsubmit="return false;" ng-click="JoinedGroup()">
-                                                <input type="text" ng-model="target_join_group" placeholder="new group" class="form-control">
+                                            <form action="#" method="post" onsubmit="return false;" ng-click="group.Join()">
+                                                <input type="text" ng-model="group.search" placeholder="new group" class="form-control">
                                             </form>
                                         </li>
-                                        <li class="list-group-item text-center" ng-repeat="x in joined_groups" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-gid="{{ x.groupid }}">
+                                        <li class="list-group-item text-center" ng-repeat="x in group.joined" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-id="{{ x.groupid }}" ng-click="chat.SetContext($event)">
                                             <strong class="text-center">{{x.groupname}}</strong>
                                         </li>
                                     </ul>
@@ -72,11 +96,11 @@
                 <div id="rooms" style="display: none;">
                     <ul class="list-group text-center">
                         <li class="list-group-item text-center">
-                            <form action="#" method="post" onsubmit="return false;" ng-click="createRoom()">
-                                <input type="text" ng-model="target_create_room" placeholder="new room" class="form-control">
+                            <form action="#" method="post" onsubmit="return false;" ng-submit="room.Create()">
+                                <input type="text" ng-model="room.create" placeholder="new room" class="form-control">
                             </form>
                         </li>
-                        <li class="list-group-item" ng-repeat="x in rooms"  data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.roomid }}" data-rid="{{ x.roomid }}">
+                        <li class="list-group-item" ng-repeat="x in rooms"  data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.roomid }}" data-id="{{ x.roomid }}" ng-click="chat.SetContext($event)">
                             <span class="label label-default text-right">{{ x.roomid }}</span><strong>{{ x.roomid }}</strong>
                         </li>
                     </ul>
@@ -101,9 +125,9 @@
                 <div>
                     <form action="#" method="post" onsubmit="return false;" style="padding-bottom: 0px;">
                         <div class="input-group">
-                            <input type="text" class="form-control" name="nextmsg" ng-model="message" value="" placeholder="Message">
+                            <input type="text" autocomplete="off" class="form-control" name="nextmsg" ng-model="chat.message" value="" placeholder="Message">
                             <span class="input-group-btn">
-                                <button class="btn btn-default" type="button" ng-click="sendit()">Send</button>
+                                <button class="btn btn-default" type="button" ng-click="chat.Send()">Send</button>
                             </span>
                         </div>
                     </form>

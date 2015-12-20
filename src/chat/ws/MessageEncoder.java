@@ -1,4 +1,4 @@
-package chat;
+package chat.ws;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -14,8 +14,9 @@ public class MessageEncoder implements Encoder.Text<Message> {
     public String encode(Message message) throws EncodeException {
 
         JsonObject jsonObject = Json.createObjectBuilder()
-                .add("subject", message.getSubject())
-                .add("content", message.getContent()).build();
+                .add("sender", message.getSender())
+                .add("content", message.getContent())
+                .add("ctime", message.getCtime()).build();
         return jsonObject.toString();
     }
 

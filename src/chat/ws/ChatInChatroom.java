@@ -1,4 +1,4 @@
-package chat;
+package chat.ws;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
@@ -23,10 +23,10 @@ public class ChatInChatroom {
     public void onMessage(Message message, Session session)
         throws IOException, EncodeException {
 
-        Message response = new Message();
-        response.setSubject(message.getSubject());
-        response.setContent(message.getContent());
-        broadcast(response);
+//        Message response = new Message();
+//        response.setSubject(message.getSubject());
+//        response.setContent(message.getContent());
+//        broadcast(response);
     }
 
     @OnOpen

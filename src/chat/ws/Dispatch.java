@@ -1,4 +1,4 @@
-package chat;
+package chat.ws;
 
 import java.io.IOException;
 

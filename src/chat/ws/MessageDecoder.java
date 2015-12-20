@@ -1,4 +1,4 @@
-package chat;
+package chat.ws;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -13,12 +13,10 @@ import java.io.StringReader;
 public class MessageDecoder implements Decoder.Text<Message> {
 
     public Message decode(String jsonMessage) throws DecodeException {
-
         JsonObject jsonObject = Json.createReader(new StringReader(jsonMessage)).readObject();
-        Message message = new Message();
-        message.setSubject(jsonObject.getString("subject"));
-        message.setContent(jsonObject.getString("content"));
-        return message;
+        Message m = new Message(jsonObject.getString("target"), jsonObject.getString("content"));
+        System.out.println(m);
+        return m;
     }
 
     public void init(EndpointConfig ec) {
@@ -31,6 +29,7 @@ public class MessageDecoder implements Decoder.Text<Message> {
             Json.createReader(new StringReader(jsonMessage)).readObject();
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -38,5 +37,4 @@ public class MessageDecoder implements Decoder.Text<Message> {
     public void destroy() {
 
     }
-
 }

@@ -39,116 +39,189 @@ app.config(function ($httpProvider) {
 });
 
 app.controller("HomeCtrl", function ($scope, $http, $location) {
-    $scope.sload = function ($event) {
-        $("#spage").children().each(function (idx) {
-            $(this).delay(100).fadeOut(100);
-        })
-        var nav = $event.currentTarget;
-        $("#" + $(nav).attr("data-page")).fadeIn(100);
-        $("#snav").children().each(function (idx) {
-            $(this).removeClass("active");
-        });
-        $(nav).parent().addClass("active");
-        $event.preventDefault();
-    };
-
-    $scope.queryGroup = function () {
-        var req = {
-            method: "POST",
-            url: "/querygroup",
-            data: { },
-        };
-        $http(req).then(
-            function (res) {
-                $scope.admin_groups = res.data.group;
-            },
-            function (res) {
-                console.log("ERROR");
-            }
-        );
-    };
-
-    $scope.queryFriend = function () {
-
-    };
-
-    $scope.queryChatRoom = function () {
-        var req = {
-            method: "POST",
-            url: "/querychatroom",
-            data: { },
-        };
-        $http(req).then(
-            function (res) {
-                
-            },
-            function (res) {
-                console.log("ERROR");
-            }
-        );
-    };
-
-    $scope.createRoom = function () {
-        var req = {
-            method: "POST",
-            url: "/constructchatroom",
-            data: {
-                "roomname": $scope.target_create_room,
-                "description": "description of " + $scope.target_create_room,
-            },
-        };
-        if ($scope.target_create_room && $scope.target_create_room.length > 0) {
-            $http(req).then(
+    $scope.friend = {
+        Query: function () {
+            $http({
+                method: "POST",
+                url: "/queryfriend",
+                data: { },
+            }).then(
                 function (res) {
-                    $scope.queryChatRoom();
+                    $scope.friend.all = res.data.friend;
                 },
                 function (res) {
                     console.log("ERROR");
                 }
             );
-        }
-    };
+        },
 
-    $scope.createGroup = function () {
-        var req = {
-            method: "POST",
-            url: "/constructgroup",
-            data: {
-                "groupname": $scope.target_create_group,
-                "description": "description of " + $scope.target_create_group,
-            },
-        };
-        $http(req).then(
-            function (res) {
-                $scope.queryGroup();
-            },
-            function (res) {
-                console.log("ERROR");
+        Search: function () {
+            if (!$scope.friend.find || $scope.friend.find.length <= 0) {
+                $scope.friend.search = [];
             }
-        );
+            else {
+                $scope.friend.search = [
+                    { userid: "1", username: "eee"},
+                    { userid: "2", username: "dddd"},
+                    { userid: "3", username: "fff"},
+                ];
+                console.log($scope.friend.search);
+            }
+        },
+
+        MakeF: function () {
+            if (!$scope.friend.targetid || $scope.friend.targetid.length <= 0) {
+                console.log("Target ID Error");
+                return;
+            }
+            $http({
+                method: "POST",
+                url: "/makefriends",
+                data: {
+                    targetid: $scope.friend.targetid,
+                },
+            }).then(
+                function (res) {
+                    $('#make_friends_modal').modal("hide");
+                    $scope.friend.Query();
+                },
+                function (res) {
+                    console.log(res);
+                }
+            );
+        },
     };
 
-    $scope.searchFriends = function (dom) {
-        if (!$scope.target_friend || $scope.target_friend.length <= 0) {
-            $scope.searched_friends = [];
-        }
-        else {
-            $scope.searched_friends = [
-                { userid: "1", username: "eee"},
-                { userid: "2", username: "dddd"},
-                { userid: "3", username: "fff"},
-            ];
-            console.log($scope.searched_friends);
-        }
+    $scope.group = {
+        Query: function () {
+            $http({
+                method: "POST",
+                url: "/querygroup",
+                data: { },
+            }).then(
+                function (res) {
+                    $scope.group.admined = res.data.group;
+                },
+                function (res) {
+                    console.log("ERROR");
+                }
+            );
+        },
+
+        Create: function () {
+            if (!$scope.group.create || $scope.group.create.length <= 0) {
+                return;
+            }
+            $http({
+                method: "POST",
+                url: "/constructgroup",
+                data: {
+                    "groupname": $scope.group.create,
+                    "description": "description of " + $scope.group.create,
+                },
+            }).then(
+                function (res) {
+                    $scope.group.Query();
+                },
+                function (res) {
+                    console.log("ERROR");
+                }
+            );
+        },
+
+        Join: function () {
+            console.log("join into a group");
+        },
     };
 
-    $scope.sendit = function () {
-        console.log($scope.message);
-    }
+    $scope.room = {
+        Query: function () {
+            $http({
+                method: "POST",
+                url: "/querychatroom",
+                data: { },
+            }).then(
+                function (res) {
+                    
+                },
+                function (res) {
+                    console.log("ERROR");
+                }
+            );
+        },
+        Create: function () {
+            if (!$scope.room.create || $scope.room.create.length <= 0) {
+                return;
+            }
+            $http({
+                method: "POST",
+                url: "/constructchatroom",
+                data: {
+                    "roomname": $scope.room.create,
+                    "description": "description of " + $scope.room.create,
+                },
+            }).then(
+                function (res) {
+                    $scope.room.Query();
+                },
+                function (res) {
+                    console.log("ERROR");
+                }
+            );
+        },
+    };
 
-    $scope.sinit = function () {
-        $scope.queryGroup();
-        $scope.queryChatRoom();
+    $scope.chat = {
+        f2fchat: new WebSocket('ws://localhost:8080' + '/f2fchat'),
+        groupchat: undefined,
+        roomchat: undefined,
+        target: '-1',
+
+        Connect: function () {
+            $scope.chat.f2fchat.onmessage = function (evt) {
+                console.log(evt);
+            };
+        },
+
+        Send: function () {
+            var message = {
+                target: $scope.chat.target,
+                content: $scope.chat.message,
+            };
+            console.log(message);
+            $scope.chat.f2fchat.send(JSON.stringify(message));
+        },
+
+        SetContext: function ($event) {
+            var uid = $($event.currentTarget).attr("data-id");
+            console.log("switch context: " + uid);
+            $scope.chat.target = uid;
+        },
+    };
+
+    $scope.init = {
+        // environment initialize.
+        Initial: function () {
+            $scope.friend.Query();
+            $scope.group.Query();
+            $scope.room.Query();
+
+            $scope.chat.Connect();
+        },
+
+        // toggle tab.
+        Toggle: function ($event) {
+            $("#spage").children().each(function (idx) {
+                $(this).delay(100).fadeOut(100);
+            })
+            var nav = $event.currentTarget;
+            $("#" + $(nav).attr("data-page")).fadeIn(100);
+            $("#snav").children().each(function (idx) {
+                $(this).removeClass("active");
+            });
+            $(nav).parent().addClass("active");
+            $event.preventDefault();
+        },
     };
 });
 
