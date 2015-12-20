@@ -11,6 +11,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Dongfang on 2015/12/16.
@@ -48,10 +50,12 @@ public class QueryChatroom extends HttpServlet {
             ps = conn.prepareStatement(sql);
             ps.setObject(1, username);
             rs = ps.executeQuery();
-            ArrayList<String> array = new ArrayList<String>();
+            ArrayList<Map<String, String>> array = new ArrayList<>();
             while (rs.next()) {
-                array.add(rs.getString("roomid"));
-                array.add(rs.getString("roomname"));
+                Map<String, String> m = new TreeMap<>();
+                m.put("roomid", rs.getString("roomid"));
+                m.put("roomname", rs.getString("roomname"));
+                array.add(m);
             }
             writer.add("status", "success");
             writer.add("chat", array).write();

@@ -12,6 +12,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Dongfang on 2015/12/16.
@@ -50,10 +52,12 @@ public class QueryGroup extends HttpServlet {
             ps = conn.prepareStatement(sql);
             ps.setObject(1, username);
             rs = ps.executeQuery();
-            ArrayList<String> array = new ArrayList<String>();
+            ArrayList<Map<String, String>> array = new ArrayList<>();
             while (rs.next()) {
-                array.add(rs.getString("groupid"));
-                array.add(rs.getString("groupname"));
+                Map<String, String> m = new TreeMap<>();
+                m.put("groupid", rs.getString("groupid"));
+                m.put("groupname", rs.getString("groupname"));
+                array.add(m);
             }
             writer.add("status", "success");
             writer.add("group", array).write();

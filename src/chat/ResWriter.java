@@ -3,6 +3,7 @@ package chat;
 import javax.json.*;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by He Tao on 2015/12/15.
@@ -30,17 +31,29 @@ public final class ResWriter {
         return this;
     }
 
-    public  ResWriter add(String key, List<String> element) {
+    public  ResWriter add(String key, Map<String, String> elements) {
         JsonArrayBuilder arraybuilder;
         arraybuilder = Json.createArrayBuilder();
-        for (int i = 0; i < element.size(); i += 2) {
-            JsonObjectBuilder t  = Json.createObjectBuilder();;
-            t.add("groupid", element.get(i));
-            t.add("groupname", element.get(i + 1));
+        for (Map.Entry<String, String> e: elements.entrySet()) {
+            JsonObjectBuilder t  = Json.createObjectBuilder();
+            t.add(e.getKey(), e.getValue());
             arraybuilder.add(t);
         }
         this.builder.add(key, arraybuilder);
         return this;
     }
 
+    public  ResWriter add(String key, List<Map<String, String>> elements) {
+        JsonArrayBuilder arraybuilder;
+        arraybuilder = Json.createArrayBuilder();
+        for (Map<String, String> m: elements) {
+            JsonObjectBuilder t  = Json.createObjectBuilder();;
+            for (Map.Entry<String, String> e: m.entrySet()) {
+                t.add(e.getKey(), e.getValue());
+            }
+            arraybuilder.add(t);
+        }
+        this.builder.add(key, arraybuilder);
+        return this;
+    }
 }
