@@ -14,7 +14,7 @@ import java.sql.ResultSet;
 /**
  * Created by Dongfang on 2015/12/15.
  */
-@WebServlet(name = "Modify")
+@WebServlet(name = "Modify", urlPatterns = {"/modify"})
 public class Modify extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 /**
  * Created by Dongfang on 2015/12/16.
  */
-@WebServlet(name = "QueryGroup")
+@WebServlet(name="QueryGroup", urlPatterns = {"/querygroup"})
 public class QueryGroup extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

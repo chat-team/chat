@@ -12,7 +12,7 @@ import java.sql.ResultSet;
 /**
  * Created by Dongfang on 2015/12/15.
  */
-@WebServlet(name = "Login")
+@WebServlet(name = "Login", urlPatterns = {"/login"})
 public class Login extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

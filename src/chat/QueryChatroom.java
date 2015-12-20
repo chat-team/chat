@@ -15,7 +15,7 @@ import java.util.ArrayList;
 /**
  * Created by Dongfang on 2015/12/16.
  */
-@WebServlet(name = "QueryChatroom")
+@WebServlet(name = "QueryChatroom", urlPatterns = {"/querychatroom"})
 public class QueryChatroom extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

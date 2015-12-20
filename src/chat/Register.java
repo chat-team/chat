@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * Created by Dongfang on 2015/12/15.
  */
-@WebServlet(name = "Register")
+@WebServlet(name = "Register", urlPatterns = {"/register"})
 public class Register extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

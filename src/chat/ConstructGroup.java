@@ -13,7 +13,7 @@ import java.sql.PreparedStatement;
 /**
  * Created by Dongfang on 2015/12/16.
  */
-@WebServlet(name = "ConstructGroup")
+@WebServlet(name = "ConstructGroup", urlPatterns = {"/constructgroup"})
 public class ConstructGroup extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

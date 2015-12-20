@@ -14,7 +14,7 @@ import java.sql.ResultSet;
 /**
  * Created by Dongfang on 2015/12/16.
  */
-@WebServlet(name = "ConstructChatroom")
+@WebServlet(name = "ConstructChatroom", urlPatterns = {"/constructchatroom"})
 public class ConstructChatroom extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
