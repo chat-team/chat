@@ -46,7 +46,7 @@ create table chatroom (
 create table friend (
 	useraid integer not null,
     userbid integer not null,
-    state bool not null,
+    state bool not null default false,
     primary key (useraid, userbid)
 ) engine=innodb, charset=utf8;
 
