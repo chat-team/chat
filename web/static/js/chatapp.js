@@ -175,7 +175,16 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
         f2fchat: new WebSocket('ws://localhost:8080' + '/f2fchat'),
         groupchat: undefined,
         roomchat: undefined,
-        target: '-1',
+        target: {
+            kind: '',
+            id: '-1',
+        },
+        log: {
+            f2f: {
+
+            },
+
+        },
 
         Connect: function () {
             $scope.chat.f2fchat.onmessage = function (evt) {
@@ -185,17 +194,23 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
 
         Send: function () {
             var message = {
-                target: $scope.chat.target,
+                target: $scope.chat.target.id,
                 content: $scope.chat.message,
             };
+            var socket = $scope.chat.target.kind == 'friend' ? $scope.chat.f2fchat
+                    : $scope.chat.target.kind == 'group' ? $scope.chat.groupchat
+                    : $scope.chat.target.kind == 'room' ? $scope.chat.roomchat : undefined;
             console.log(message);
-            $scope.chat.f2fchat.send(JSON.stringify(message));
+            if (socket) {
+                socket.send(JSON.stringify(message));
+            }
         },
 
         SetContext: function ($event) {
-            var uid = $($event.currentTarget).attr("data-id");
-            console.log("switch context: " + uid);
-            $scope.chat.target = uid;
+            var dom = $($event.currentTarget);
+            console.log("switch context: " + dom.attr("data-kind") + "  " + dom.attr("data-id"));
+            $scope.chat.target.kind = dom.attr("data-kind");
+            $scope.chat.target.id = dom.attr("data-id");
         },
     };
 

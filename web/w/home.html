@@ -14,10 +14,10 @@
                         <li class="list-group-item text-center">
                             <input type="text" ng-model="friend.find" placeholder="new friend" class="form-control" ng-change="friend.Search(this)">
                         </li>
-                        <li class="list-group-item" ng-repeat="x in friend.search" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.userid }}" data-gid="{{ x.userid }}">
+                        <li class="list-group-item" ng-repeat="x in friend.search" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.userid }}" data-id="{{ x.userid }}">
                             <span>{{ x.nickname }}</span>
                         </li>
-                        <li class="list-group-item" ng-repeat="x in friend.all" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.userid }}" data-id="{{ x.userid }}" ng-click="chat.SetContext($event)">
+                        <li class="list-group-item" ng-repeat="x in friend.all" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.userid }}" data-id="{{ x.userid }}" data-kind="friend" ng-click="chat.SetContext($event)">
                             <span>{{ x.nickname }}</span>
                         </li>
                         <li class="list-group-item" data-toggle="modal" data-target="#make_friends_modal">
@@ -65,7 +65,7 @@
                                                 <input type="text" ng-model="group.create" placeholder="create new group" class="form-control">
                                             </form>
                                         </li>
-                                        <li class="list-group-item text-center" ng-repeat="x in group.admined" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-id="{{ x.groupid }}" ng-click="chat.SetContext($event)">
+                                        <li class="list-group-item text-center" ng-repeat="x in group.admined" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-id="{{ x.groupid }}" data-kind="group"  ng-click="chat.SetContext($event)">
                                             <strong class="text-center">{{ x.groupname }}</strong>
                                         </li>
                                     </ul>
@@ -84,7 +84,7 @@
                                                 <input type="text" ng-model="group.search" placeholder="new group" class="form-control">
                                             </form>
                                         </li>
-                                        <li class="list-group-item text-center" ng-repeat="x in group.joined" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-id="{{ x.groupid }}" ng-click="chat.SetContext($event)">
+                                        <li class="list-group-item text-center" ng-repeat="x in group.joined" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-id="{{ x.groupid }}" data-kind="group" ng-click="chat.SetContext($event)">
                                             <strong class="text-center">{{x.groupname}}</strong>
                                         </li>
                                     </ul>
@@ -100,7 +100,7 @@
                                 <input type="text" ng-model="room.create" placeholder="new room" class="form-control">
                             </form>
                         </li>
-                        <li class="list-group-item" ng-repeat="x in rooms"  data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.roomid }}" data-id="{{ x.roomid }}" ng-click="chat.SetContext($event)">
+                        <li class="list-group-item" ng-repeat="x in rooms"  data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.roomid }}" data-id="{{ x.roomid }}" data-kind="room" ng-click="chat.SetContext($event)">
                             <span class="label label-default text-right">{{ x.roomid }}</span><strong>{{ x.roomid }}</strong>
                         </li>
                     </ul>

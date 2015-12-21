@@ -28,7 +28,7 @@ public class Login extends HttpServlet {
         String password  = reader.getString("passwd");
 
         HttpSession session = request.getSession();
-        session.setMaxInactiveInterval(60);
+        session.setMaxInactiveInterval(1200);
 
         if (password == "" || username == "") {
             writer.add("status", "failed").write();

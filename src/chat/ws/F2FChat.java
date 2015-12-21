@@ -25,44 +25,53 @@ import java.util.Map;
 )
 
 public class F2FChat {
-    private static Map<String, HttpSession> sessionMap = new Hashtable<>();
+    private static Map<String, HttpSession> httpSessionMap = new Hashtable<>();     // <WebSecokSessionID, HttpSession>
+    private static Map<String, Session> sessionMap = new Hashtable<>();             // <UserID, WebSecokSessionID>
 
     @OnOpen
     public void start(Session ws, EndpointConfig config){
         HttpSession httpSession = (HttpSession)config.getUserProperties().get(HttpSession.class.getName());
-        sessionMap.put(ws.getId(), httpSession);
-        String userid = (String) httpSession.getAttribute("userid");
-        for (Message m: this.queryAllUnread(userid)) {
-            this.reply(ws, m, userid);
+        if (httpSession == null) {
+            this.error(ws, new Exception("Not a valid WebSocket connection.")); // not a valid connection.
         }
-        System.out.println("User " + userid + " enter.");
+        else {
+            String userid = (String) httpSession.getAttribute("userid");
+            httpSessionMap.put(ws.getId(), httpSession);
+            sessionMap.put(userid, ws);
+            for (Message m: this.queryAllUnread(userid)) {
+                this.reply(ws, m, userid);
+            }
+            System.out.println("User " + userid + " enter.");
+        }
     }
 
     @OnMessage
     public void process(Session ws, Message message) {
-        HttpSession httpSession = sessionMap.get(ws.getId());
+        HttpSession httpSession = httpSessionMap.get(ws.getId());
         String sender = (String)httpSession.getAttribute("userid");
         message.setSender(sender);
         message.insertToDB();
-        Message response = message;
         this.makeRecord(message.getSender(), message.getTarget(), message.getID());
+        System.out.println("WebSocket get: " + message);
         if (sessionMap.containsKey(message.getTarget())) {
-            this.reply(ws, response, message.getTarget());
+            this.reply(sessionMap.get(message.getTarget()), message, message.getTarget());
             message.updateState(true);
         }
-        System.out.println("log 2: " + message);
     }
 
     @OnClose
     public void end(Session ws){
-        System.out.println("Colse " + sessionMap.get(ws.getId()).getAttribute("userid"));
-        sessionMap.remove(ws.getId());
+        String userid = (String)httpSessionMap.get(ws.getId()).getAttribute("userid");
+        System.out.println("User " + userid + " leave");
+        httpSessionMap.remove(ws.getId());
+        sessionMap.remove(userid);
     }
 
     @OnError
     public void error(Session ws, java.lang.Throwable throwable) {
-        System.err.println("User " + sessionMap.get(ws.getId()).getAttribute("userid") + " error: " + throwable.getMessage());
-        end(ws);
+        String userid = (String)httpSessionMap.get(ws.getId()).getAttribute("userid");
+        System.err.println("User " + userid + " error: " + throwable.getMessage());
+        this.end(ws);
     }
 
     private void makeRecord(String useraid, String userbid, int messageid) {
@@ -133,9 +142,9 @@ public class F2FChat {
         return unreads;
     }
 
-    private void reply(Session ws, Message message, String targetid) {
-        System.out.println("Reply to " + sessionMap.get(ws.getId()).getAttribute("userid"));
-        RemoteEndpoint.Basic remote = ws.getBasicRemote();
+    private void reply(Session response, Message message, String targetid) {
+        System.out.println("Reply to: " + httpSessionMap.get(response.getId()).getAttribute("userid") + message);
+        RemoteEndpoint.Basic remote = response.getBasicRemote();
         try {
             remote.sendObject(message);
         } catch (IOException e) {

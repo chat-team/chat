@@ -12,11 +12,9 @@ import java.io.StringReader;
  */
 public class MessageDecoder implements Decoder.Text<Message> {
 
-    public Message decode(String jsonMessage) throws DecodeException {
-        JsonObject jsonObject = Json.createReader(new StringReader(jsonMessage)).readObject();
-        Message m = new Message(jsonObject.getString("target"), jsonObject.getString("content"));
-        System.out.println(m);
-        return m;
+    public Message decode(String message) throws DecodeException {
+        JsonObject jsonObject = Json.createReader(new StringReader(message)).readObject();
+        return new Message(jsonObject.getString("target"), jsonObject.getString("content"));
     }
 
     public void init(EndpointConfig ec) {
