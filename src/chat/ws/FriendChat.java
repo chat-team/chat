@@ -18,13 +18,13 @@ import java.util.Map;
  * Created by He Tao on 2015/12/20.
  */
 @ServerEndpoint(
-        value = "/f2fchat",
+        value = "/chat/friend",
         configurator = SessionConfig.class,
         encoders = { MessageEncoder.class },
         decoders = { MessageDecoder.class }
 )
 
-public class F2FChat {
+public class FriendChat {
     private static Map<String, HttpSession> httpSessionMap = new Hashtable<>();     // <WebSecokSessionID, HttpSession>
     private static Map<String, Session> sessionMap = new Hashtable<>();             // <UserID, WebSecokSessionID>
 
@@ -106,7 +106,10 @@ public class F2FChat {
         List<Message> unreads = new ArrayList<>();
         DatabaseConnection dbConn = new DatabaseConnection();
         Connection conn = dbConn.getConnection();
-        String sql = "select * from message where state=false and messageid in (select messageid from chat_record where userbid=?)";
+        String sql = "select * from message where\n" +
+                "state=false\n" +
+                "and\n" +
+                "messageid in (select messageid from chat_record where userbid=?) order by ctime";
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
@@ -143,7 +146,7 @@ public class F2FChat {
     }
 
     private void reply(Session response, Message message, String targetid) {
-        System.out.println("Reply to: " + httpSessionMap.get(response.getId()).getAttribute("userid") + message);
+        System.out.println("Reply to: " + targetid + " " + message);
         RemoteEndpoint.Basic remote = response.getBasicRemote();
         try {
             remote.sendObject(message);

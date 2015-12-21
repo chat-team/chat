@@ -18,7 +18,7 @@
                             <span>{{ x.nickname }}</span>
                         </li>
                         <li class="list-group-item" ng-repeat="x in friend.all" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.userid }}" data-id="{{ x.userid }}" data-kind="friend" ng-click="chat.SetContext($event)">
-                            <span>{{ x.nickname }}</span>
+                            <span>{{ x.nickname }}</span><span class="badge" id="badge-friend-{{ x.userid }}"></span>
                         </li>
                         <li class="list-group-item" data-toggle="modal" data-target="#make_friends_modal">
                             <span class="glyphicon glyphicon-plus"></span>
@@ -85,7 +85,7 @@
                                             </form>
                                         </li>
                                         <li class="list-group-item text-center" ng-repeat="x in group.joined" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-id="{{ x.groupid }}" data-kind="group" ng-click="chat.SetContext($event)">
-                                            <strong class="text-center">{{x.groupname}}</strong>
+                                            <strong class="text-center">{{ x.groupname }}</strong>
                                         </li>
                                     </ul>
                                 </div>
@@ -112,22 +112,22 @@
             <div style="height: 640px;">
                 <div style="height: 600px;">
                     <form role="form">
-                        <div ng-repeat="log in [{sender: 'A', message: 'dddd'}, {sender: 'B', message: 'eeee'}, {sender: 'C', message: 'ffff'}]">
+                        <div ng-repeat="x in chat.unreads">
                             <br />
                             <div class="input-group">
-                                <span class="input-group-addon">{{ log.sender }}</span>
-                                <input type="text" class="form-control" placeholder="" value="{{ log.message }}">
+                                <span class="input-group-addon" data-toggle="tooltip" tooltip-placement="bottom" tooltip="{{ x.ctime }}">{{ x.sender }}</span>
+                                <input type="text" class="form-control" placeholder="" value="{{ x.content }}">
                             </div>
                         </div>
                     </form>
                 </div>
                 
                 <div>
-                    <form action="#" method="post" onsubmit="return false;" style="padding-bottom: 0px;">
+                    <form action="#" method="post" onsubmit="return false;" ng-submit="chat.Send()" style="padding-bottom: 0px;">
                         <div class="input-group">
                             <input type="text" autocomplete="off" class="form-control" name="nextmsg" ng-model="chat.message" value="" placeholder="Message">
                             <span class="input-group-btn">
-                                <button class="btn btn-default" type="button" ng-click="chat.Send()">Send</button>
+                                <button class="btn btn-default" type="submit">Send</button>
                             </span>
                         </div>
                     </form>

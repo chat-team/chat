@@ -172,23 +172,43 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
     };
 
     $scope.chat = {
-        f2fchat: new WebSocket('ws://localhost:8080' + '/f2fchat'),
-        groupchat: undefined,
-        roomchat: undefined,
+        socket: {
+            friendchat: new WebSocket('ws://localhost:8080/chat/friend'),
+            groupchat: undefined,
+            roomchat: undefined,
+        },
         target: {
             kind: '',
             id: '-1',
         },
         log: {
-            f2f: {
+            friend: {
 
             },
+            group: {
 
+            },
+            room: {
+
+            },
         },
+        unreads: [],
 
         Connect: function () {
-            $scope.chat.f2fchat.onmessage = function (evt) {
-                console.log(evt);
+            $scope.chat.socket.friendchat.onmessage = function (evt) {
+                var message = JSON.parse(evt.data);
+                console.log("f2f chat get message: " + JSON.stringify(message));
+                var sender = message.sender;
+                if ($scope.chat.target.kind === 'friend' && $scope.chat.target.id === sender) {
+                    
+                }
+                else {
+                    var badge = $("span#badge-friend-" + sender);
+                    badge.html(eval(badge.html().length > 0 ? badge.html() : 0) + 1);
+                    var log = $scope.chat.log.friend[sender] || [];
+                    log.push(message);
+                    $scope.chat.log.friend[sender] = log;
+                }
             };
         },
 
@@ -197,20 +217,27 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
                 target: $scope.chat.target.id,
                 content: $scope.chat.message,
             };
-            var socket = $scope.chat.target.kind == 'friend' ? $scope.chat.f2fchat
-                    : $scope.chat.target.kind == 'group' ? $scope.chat.groupchat
-                    : $scope.chat.target.kind == 'room' ? $scope.chat.roomchat : undefined;
-            console.log(message);
+            var ws = $scope.chat.target.kind + "chat";
+            var socket = $scope.chat.socket[ws];
             if (socket) {
+                console.log(message);
                 socket.send(JSON.stringify(message));
             }
         },
 
         SetContext: function ($event) {
             var dom = $($event.currentTarget);
-            console.log("switch context: " + dom.attr("data-kind") + "  " + dom.attr("data-id"));
-            $scope.chat.target.kind = dom.attr("data-kind");
-            $scope.chat.target.id = dom.attr("data-id");
+            var kind = dom.attr("data-kind");
+            var id = dom.attr("data-id");
+            console.log("switch context: " + kind + "  " + id);
+            $scope.chat.target.kind = kind;
+            $scope.chat.target.id = id;
+            if ($scope.chat.log[kind][id]) {
+                $scope.chat.unreads = $scope.chat.log[kind][id];
+                $scope.chat.log[kind][id] = [];
+                console.log($scope.chat.unreads);
+            }
+            dom.children("span.badge").html('');
         },
     };
 
