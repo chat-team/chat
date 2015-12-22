@@ -9,22 +9,20 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
- * Created by He Tao on 2015/12/20.
+ * Created by Dongfang on 2015/12/21.
  */
+
 @ServerEndpoint(
-        value = "/chat/friend",
+        value = "/chat/group",
         configurator = SessionConfig.class,
         encoders = { MessageEncoder.class },
         decoders = { MessageDecoder.class }
 )
+public class GroupChat {
 
-public class FriendChat {
     private static Map<String, HttpSession> httpSessionMap = new Hashtable<>();     // <WebSecokSessionID, HttpSession>
     private static Map<String, Session> sessionMap = new Hashtable<>();             // <UserID, WebSecokSessionID>
 
@@ -35,33 +33,31 @@ public class FriendChat {
             this.error(ws, new Exception("Not a valid WebSocket connection.")); // not a valid connection.
         }
         else {
-            ws.setMaxTextMessageBufferSize(600);
             String userid = (String) httpSession.getAttribute("userid");
             httpSessionMap.put(ws.getId(), httpSession);
             sessionMap.put(userid, ws);
-            for (Message m: this.queryAllUnread(userid)) {
-                this.reply(ws, m, userid);
-            }
             System.out.println("User " + userid + " enter.");
         }
     }
 
     @OnMessage
-    public void process(Session ws, Message message) {
+    public void onMessage(Session ws, Message message) {
         HttpSession httpSession = httpSessionMap.get(ws.getId());
         String sender = (String)httpSession.getAttribute("userid");
         message.setSender(sender);
+        message.setGroup(message.getTarget());
         message.insertToDB();
-        this.makeRecord(message.getSender(), message.getTarget(), message.getID());
+        this.makeRecord(message.getTarget(), message.getID());
         System.out.println("WebSocket get: " + message);
-        if (sessionMap.containsKey(message.getTarget())) {
-            this.reply(sessionMap.get(message.getTarget()), message, message.getTarget());
-            message.updateState(true);
+        try {
+            broadcast(message, message.getTarget());
+        }catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     @OnClose
-    public void end(Session ws){
+    public void onClose(Session ws) {
         String userid = (String)httpSessionMap.get(ws.getId()).getAttribute("userid");
         System.out.println("User " + userid + " leave");
         httpSessionMap.remove(ws.getId());
@@ -72,19 +68,18 @@ public class FriendChat {
     public void error(Session ws, java.lang.Throwable throwable) {
         String userid = (String)httpSessionMap.get(ws.getId()).getAttribute("userid");
         System.err.println("User " + userid + " error: " + throwable.getMessage());
-        this.end(ws);
+        this.onClose(ws);
     }
 
-    private void makeRecord(String useraid, String userbid, int messageid) {
+    private void makeRecord(String groupid, int messageid) {
         DatabaseConnection dbConn = new DatabaseConnection();
         Connection conn = dbConn.getConnection();
-        String sql = "insert into chat_record (useraid, userbid, messageid) values (?, ?, ?)";
+        String sql = "insert into group_record (groupid, messageid) values (?, ?)";
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sql);
-            ps.setString(1, useraid);
-            ps.setString(2, userbid);
-            ps.setInt(3, messageid);
+            ps.setString(1, groupid);
+            ps.setInt(2, messageid);
             ps.executeUpdate();
         } catch(Exception e) {
             e.printStackTrace();
@@ -103,30 +98,22 @@ public class FriendChat {
         }
     }
 
-    private List<Message> queryAllUnread(String targetid) {
-        List<Message> unreads = new ArrayList<>();
+    private void broadcast(Message message, String groupid) throws EncodeException{
         DatabaseConnection dbConn = new DatabaseConnection();
         Connection conn = dbConn.getConnection();
-        String sql = "select * from message where\n" +
-                "state=false\n" +
-                "and\n" +
-                "messageid in (select messageid from chat_record where userbid=?) order by ctime";
+        String sql = "SELECT userid FROM group_belong WHERE groupid = ?";
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
             ps = conn.prepareStatement(sql);
-            ps.setString(1, targetid);
+            ps.setString(1, groupid);
             rs = ps.executeQuery();
             while (rs.next()) {
-                Message m = new Message(targetid, rs.getString("content"));
-                m.setSender(rs.getString("userid"));
-                m.setCtime(rs.getString("ctime"));
-                m.setMessageID(rs.getInt("messageid"));
-                unreads.add(m);
-            }
-            // mark all message as read.
-            for (Message m: unreads) {
-                m.updateState(true);
+                String user = rs.getString("userid");
+                if (sessionMap.containsKey(user)) {
+                    this.reply(sessionMap.get(user), message, user);
+                    //message.updateState(true);
+                }
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -146,7 +133,6 @@ public class FriendChat {
                 e.printStackTrace();
             }
         }
-        return unreads;
     }
 
     private void reply(Session response, Message message, String targetid) {
@@ -160,5 +146,5 @@ public class FriendChat {
             e.printStackTrace();
         }
     }
-}
 
+}
