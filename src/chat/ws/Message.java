@@ -16,6 +16,8 @@ public class Message {
     private String content;
     private String target;
     private String ctime;
+    private String group;
+    private String room;
 
     private String subject;
 
@@ -63,6 +65,22 @@ public class Message {
 
     public String getContent() {
         return content;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setRoom(String room) {
+        this.room = room;
+    }
+
+    public String getRoom() {
+        return room;
     }
 
     public Message insertToDB() {
