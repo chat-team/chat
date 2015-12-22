@@ -1,5 +1,10 @@
 var app = angular.module("chatApp", ['ngRoute', 'ui.bootstrap', 'ngAnimate']);
 
+app.value('$user', {
+    id: '',
+    name: '',
+});
+
 app.config(function ($routeProvider) {
     $routeProvider
         .when("/home", {
@@ -38,7 +43,7 @@ app.config(function ($httpProvider) {
     $httpProvider.interceptors.push('RedirectInterceptor');
 });
 
-app.controller("HomeCtrl", function ($scope, $http, $location) {
+app.controller("HomeCtrl", ['$user', '$scope', '$http', '$location', function ($user, $scope, $http, $location) {
     $scope.friend = {
         Query: function () {
             $http({
@@ -103,7 +108,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
                     $scope.group.admined = res.data.group;
                 },
                 function (res) {
-                    console.log("ERROR");
+                    console.log("Query all groups ERROR");
                 }
             );
         },
@@ -124,13 +129,30 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
                     $scope.group.Query();
                 },
                 function (res) {
-                    console.log("ERROR");
+                    console.log("Create a new group ERROR");
                 }
             );
         },
 
         Join: function () {
-            console.log("join into a group");
+            if (!$scope.group.search || $scope.group.search.length <= 0) {
+                return;
+            }
+            $http({
+                method: "POST",
+                url: "/constructgroup",
+                data: {
+                    "groupname": $scope.group.search,
+                    "description": "description of " + $scope.group.search,
+                },
+            }).then(
+                function (res) {
+                    $scope.group.Query();
+                },
+                function (res) {
+                    console.log("Join into group ERROR");
+                }
+            );
         },
     };
 
@@ -173,8 +195,8 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
 
     $scope.chat = {
         socket: {
-            friendchat: new WebSocket('ws://localhost:8080/chat/friend'),
-            groupchat: undefined,
+            friendchat: new WebSocket('ws://' + location.host + '/chat/friend'),
+            groupchat: new WebSocket('ws://' + location.host + '/chat/group'),
             roomchat: undefined,
         },
         target: {
@@ -197,35 +219,67 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
         Connect: function () {
             $scope.chat.socket.friendchat.onmessage = function (evt) {
                 var message = JSON.parse(evt.data);
-                console.log("f2f chat get message: " + JSON.stringify(message));
+                console.log("friend chat get message: " + JSON.stringify(message));
                 var sender = message.sender;
                 if ($scope.chat.target.kind === 'friend' && $scope.chat.target.id === sender) {
-                    
+                    $scope.chat.unreads.push(message); // show it.
                 }
                 else {
                     var badge = $("span#badge-friend-" + sender);
                     badge.html(eval(badge.html().length > 0 ? badge.html() : 0) + 1);
-                    var log = $scope.chat.log.friend[sender] || [];
-                    log.push(message);
-                    $scope.chat.log.friend[sender] = log;
+                    $scope.chat.log['friend'][sender] = $scope.chat.log['friend'][sender] || [];
+                    $scope.chat.log['friend'][sender].push(message);
                 }
+                $scope.$apply();
             };
             $scope.chat.socket.friendchat.onclose = function (evt) {
+                console.log(evt);
+            };
+            $scope.chat.socket.groupchat.onmessage = function (evt) {
+                var message = JSON.parse(evt.data);
+                console.log("group chat get message: " + JSON.stringify(message));
+                var sender = message.sender, group = message.group;
+                if (sender === $user.id) { return; } // ignore response message to user self.
+                if ($scope.chat.target.kind === "group" && $scope.chat.target.id === group) {
+                    $scope.chat.unreads.push(message);
+                }
+                else {
+                    var badge = $("span#badge-group-" + group);
+                    badge.html(eval(badge.html().length > 0 ? badge.html() : 0) + 1);
+                    $scope.chat.log['group'][group] = $scope.chat.log['group'][group] || [];
+                    $scope.chat.log['group'][group].push(message); // store it.
+                }
+                $scope.$apply();
+            };
+            $scope.chat.socket.groupchat.onclose = function (evt) {
                 console.log(evt);
             };
         },
 
         Send: function () {
+            var kind = $scope.chat.target.kind;
+            var id = $scope.chat.target.id;
+            var content = $scope.chat.message;
+            if (!content || content.length == 0) {
+                content = " ";
+            }
+            if (content.length > 512) {
+                content = "Too long message!";
+            }
             var message = {
-                target: $scope.chat.target.id,
-                content: $scope.chat.message.length > 512 ? "Too long message!" : $scope.chat.message,
+                target: id,
+                content: content,
             };
-            var ws = $scope.chat.target.kind + "chat";
-            var socket = $scope.chat.socket[ws];
+            var socket = $scope.chat.socket[kind + "chat"];
             if (socket) {
                 console.log(message);
                 socket.send(JSON.stringify(message));
             }
+            $scope.chat.unreads.push({
+                content: content,
+                self: true,
+            });
+            $scope.chat.message = ""; // reset.
         },
 
         SetContext: function ($event) {
@@ -235,11 +289,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
             console.log("switch context: " + kind + "  " + id);
             $scope.chat.target.kind = kind;
             $scope.chat.target.id = id;
-            if ($scope.chat.log[kind][id]) {
-                $scope.chat.unreads = $scope.chat.log[kind][id];
-                $scope.chat.log[kind][id] = [];
-                console.log($scope.chat.unreads);
-            }
+            $scope.chat.unreads = $scope.chat.log[kind][id] || [];
             dom.children("span.badge").html('');
         },
     };
@@ -254,6 +304,10 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
             $scope.chat.Connect();
 
             // js binding.
+            $('div.chatting').bind('DOMSubtreeModified', function (evt) {
+                var dom = $(evt.currentTarget);
+                dom.scrollTop(dom.prop("scrollHeight"));
+            });
         },
 
         // toggle tab.
@@ -269,10 +323,11 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
             $(nav).parent().addClass("active");
             $event.preventDefault();
         },
-    };
-});
 
-app.controller("LoginCtrl", function ($scope, $http, $location) {
+    };
+}]);
+
+app.controller("LoginCtrl", ['$user', '$scope', '$http', '$location', function ($user, $scope, $http, $location) {
     $scope.login = function () {
         var req = {
             method: "POST",
@@ -285,6 +340,8 @@ app.controller("LoginCtrl", function ($scope, $http, $location) {
         $http(req).then(
             function (res) {
                 if (res.data['status'] === 'success') {
+                    // store user ID.
+                    $user.id = $scope.userid;
                     $location.path("/home");
                 }
                 else {
@@ -296,7 +353,7 @@ app.controller("LoginCtrl", function ($scope, $http, $location) {
             }
         );
     }
-});
+}]);
 
 app.controller("RegisterCtrl", function ($scope, $http, $location) {
     $scope.register = function () {
