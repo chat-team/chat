@@ -45,7 +45,7 @@ public class QueryGroup extends HttpServlet {
 
         DatabaseConnection dbConn = new DatabaseConnection();
         Connection conn = dbConn.getConnection();
-        String sql = "SELECT group_belong.groupid, groupname FROM group_belong, group_info WHERE group_belong.groupid = group_info.groupid and userid = ?";
+        String sql = "SELECT group_belong.groupid, groupname, admin FROM group_belong, group_info WHERE group_belong.groupid = group_info.groupid and userid = ?";
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
@@ -57,6 +57,7 @@ public class QueryGroup extends HttpServlet {
                 Map<String, String> m = new TreeMap<>();
                 m.put("groupid", rs.getString("groupid"));
                 m.put("groupname", rs.getString("groupname"));
+                m.put("admin", rs.getString("admin"));
                 array.add(m);
             }
             writer.add("status", "success");

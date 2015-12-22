@@ -14,7 +14,11 @@ public class MessageDecoder implements Decoder.Text<Message> {
 
     public Message decode(String message) throws DecodeException {
         JsonObject jsonObject = Json.createReader(new StringReader(message)).readObject();
-        return new Message(jsonObject.getString("target"), jsonObject.getString("content"));
+        Message m = new Message(jsonObject.getString("target"), jsonObject.getString("content"));
+        if (jsonObject.containsKey("status")) {
+            m.setStatus(jsonObject.getString("status"));
+        }
+        return m;
     }
 
     public void init(EndpointConfig ec) {
