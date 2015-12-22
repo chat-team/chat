@@ -210,12 +210,15 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
                     $scope.chat.log.friend[sender] = log;
                 }
             };
+            $scope.chat.socket.friendchat.onclose = function (evt) {
+                console.log(evt);
+            };
         },
 
         Send: function () {
             var message = {
                 target: $scope.chat.target.id,
-                content: $scope.chat.message,
+                content: $scope.chat.message.length > 512 ? "Too long message!" : $scope.chat.message,
             };
             var ws = $scope.chat.target.kind + "chat";
             var socket = $scope.chat.socket[ws];
@@ -249,6 +252,8 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
             $scope.room.Query();
 
             $scope.chat.Connect();
+
+            // js binding.
         },
 
         // toggle tab.
