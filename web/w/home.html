@@ -108,15 +108,24 @@
             </div>
         </div>
         
-        <div class="col-md-9 col-sm-9 panel panel-home">
+        <div class="col-md-9 col-sm-9 col-xs-9 col-lg-9 text-center panel panel-home">
             <div style="height: 640px;">
-                <div style="height: 600px;">
+                <div class="chatting">
                     <form role="form">
                         <div ng-repeat="x in chat.unreads">
                             <br />
-                            <div class="input-group">
-                                <span class="input-group-addon" data-toggle="tooltip" tooltip-placement="bottom" tooltip="{{ x.ctime }}">{{ x.sender }}</span>
-                                <input type="text" class="form-control" placeholder="" value="{{ x.content }}">
+                            <div class="input-group text-left">
+                                <span class="input-group-addon" data-toggle="tooltip" tooltip-placement="bottom" tooltip="{{ x.ctime }}">
+                                    <button class="form-control btn btn-default btn-sm"><span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;{{ x.sender }}</button>
+                                </span>
+                                <span class="auto-scaling form-control pull-left" contenteditable="false">{{ x.content }}</span>
+                            </div>
+                            <br />
+                            <div class="row input-group text-right">
+                                <span class="auto-scaling form-control pull-right" contenteditable="true">{{ x.content }}</span>
+                                <span class="input-group-addon" data-toggle="tooltip" tooltip-placement="bottom" tooltip="{{ x.ctime }}">
+                                    <button class="form-control btn btn-default btn-sm">{{ x.sender }}&nbsp;&nbsp;<span class="glyphicon glyphicon-user"></span></button>
+                                </span>
                             </div>
                         </div>
                     </form>
@@ -125,7 +134,7 @@
                 <div>
                     <form action="#" method="post" onsubmit="return false;" ng-submit="chat.Send()" style="padding-bottom: 0px;">
                         <div class="input-group">
-                            <input type="text" autocomplete="off" class="form-control" name="nextmsg" ng-model="chat.message" value="" placeholder="Message">
+                            <input type="text" maxlength="512" autocomplete="off" class="form-control" name="nextmsg" ng-model="chat.message" value="" placeholder="Message">
                             <span class="input-group-btn">
                                 <button class="btn btn-default" type="submit">Send</button>
                             </span>

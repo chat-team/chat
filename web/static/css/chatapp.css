@@ -110,3 +110,33 @@ div.model#add_friend_modal {
     width: 300px;
     height: 300px;
 }
+
+.auto-scaling {
+    width: auto !important;
+    height: auto !important;
+    max-width: 600px;
+/*    max-width: -moz-calc(100% - 100px);
+    max-width: -webkit-calc(100% - 100px);
+    max-width: calc(100% - 100px);*/
+}
+
+div.chatting {
+    height: 600px;
+    min-height: 600px;
+    max-height: 600px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 5px 10px 10px 10px;
+}
+
+.input-group > .input-group-addon {
+    border: 0px none !important;
+    background-color: #ffffff !important;
+    vertical-align: top;
+    padding-top: 0px;
+}
+
+.tooltip {
+    max-width: 100px !important;
+}
+

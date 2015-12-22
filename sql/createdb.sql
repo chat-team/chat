@@ -22,7 +22,7 @@ create table group_info (
 create table message (
 	messageid integer primary key not null auto_increment,
     ctime timestamp not null default CURRENT_TIMESTAMP,
-    content varchar(100) not null,
+    content varchar(512) not null,
     userid integer not null,
     state bool not null
 ) engine=innodb, charset=utf8;
