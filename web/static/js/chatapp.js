@@ -1,10 +1,5 @@
 var app = angular.module("chatApp", ['ngRoute', 'ui.bootstrap', 'ngAnimate']);
 
-app.value('$user', {
-    id: '',
-    name: '',
-});
-
 app.config(function ($routeProvider) {
     $routeProvider
         .when("/home", {
@@ -28,7 +23,7 @@ app.config(function ($routeProvider) {
         });
 });
 
-app.factory('RedirectInterceptor',['$q','$location', function ($q, $location) {
+app.factory('RedirectInterceptor', ['$q','$location', function ($q, $location) {
     return {
         responseError: function (res) {
             if (res.status === 401) {
@@ -43,7 +38,9 @@ app.config(function ($httpProvider) {
     $httpProvider.interceptors.push('RedirectInterceptor');
 });
 
-app.controller("HomeCtrl", ['$user', '$scope', '$http', '$location', function ($user, $scope, $http, $location) {
+app.controller("HomeCtrl", function ($scope, $http, $location) {
+    $scope.userid = $.cookie('userid') || '';
+
     $scope.friend = {
         Query: function () {
             $http({
@@ -105,7 +102,17 @@ app.controller("HomeCtrl", ['$user', '$scope', '$http', '$location', function ($
                 data: { },
             }).then(
                 function (res) {
-                    $scope.group.admined = res.data.group;
+                    $scope.group.admined = [];
+                    $scope.group.joined = [];
+                    for (var i = 0; i < res.data.group.length; ++i) {
+                        var g = res.data.group[i];
+                        if (g.admin === $.cookie('userid')) {
+                            $scope.group.admined.push(g);
+                        }
+                        else {
+                            $scope.group.joined.push(g);
+                        }
+                    }
                 },
                 function (res) {
                     console.log("Query all groups ERROR");
@@ -140,10 +147,9 @@ app.controller("HomeCtrl", ['$user', '$scope', '$http', '$location', function ($
             }
             $http({
                 method: "POST",
-                url: "/constructgroup",
+                url: "/joingroup",
                 data: {
-                    "groupname": $scope.group.search,
-                    "description": "description of " + $scope.group.search,
+                    "targetid": $scope.group.search,
                 },
             }).then(
                 function (res) {
@@ -239,7 +245,7 @@ app.controller("HomeCtrl", ['$user', '$scope', '$http', '$location', function ($
                 var message = JSON.parse(evt.data);
                 console.log("group chat get message: " + JSON.stringify(message));
                 var sender = message.sender, group = message.group;
-                if (sender === $user.id) { return; } // ignore response message to user self.
+                if (sender === $scope.userid) { return; } // ignore response message to user self.
                 if ($scope.chat.target.kind === "group" && $scope.chat.target.id === group) {
                     $scope.chat.unreads.push(message);
                 }
@@ -325,9 +331,9 @@ app.controller("HomeCtrl", ['$user', '$scope', '$http', '$location', function ($
         },
 
     };
-}]);
+});
 
-app.controller("LoginCtrl", ['$user', '$scope', '$http', '$location', function ($user, $scope, $http, $location) {
+app.controller("LoginCtrl", function ($scope, $http, $location) {
     $scope.login = function () {
         var req = {
             method: "POST",
@@ -340,8 +346,8 @@ app.controller("LoginCtrl", ['$user', '$scope', '$http', '$location', function (
         $http(req).then(
             function (res) {
                 if (res.data['status'] === 'success') {
-                    // store user ID.
-                    $user.id = $scope.userid;
+                    // store user ID in cookie.
+                    $.cookie("userid", $scope.userid);
                     $location.path("/home");
                 }
                 else {
@@ -353,7 +359,7 @@ app.controller("LoginCtrl", ['$user', '$scope', '$http', '$location', function (
             }
         );
     }
-}]);
+});
 
 app.controller("RegisterCtrl", function ($scope, $http, $location) {
     $scope.register = function () {
