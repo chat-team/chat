@@ -18,6 +18,7 @@ public class Message {
     private String ctime;
     private String group;
     private String room;
+    private String status;
 
     private String subject;
 
@@ -81,6 +82,14 @@ public class Message {
 
     public String getRoom() {
         return room;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getStatus() {
+        return status;
     }
 
     public Message insertToDB() {

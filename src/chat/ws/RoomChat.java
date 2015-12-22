@@ -9,19 +9,20 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Created by Dongfang on 2015/12/21.
+ * Created by Dongfang on 2015/12/17.
  */
-
 @ServerEndpoint(
-        value = "/chat/group",
+        value = "/chat/room",
         configurator = SessionConfig.class,
         encoders = { MessageEncoder.class },
         decoders = { MessageDecoder.class }
 )
-public class GroupChat {
+public class RoomChat {
 
     private static Map<String, HttpSession> httpSessionMap = new Hashtable<>();     // <WebSecokSessionID, HttpSession>
     private static Map<String, Session> sessionMap = new Hashtable<>();             // <UserID, WebSecokSessionID>
@@ -41,18 +42,24 @@ public class GroupChat {
     }
 
     @OnMessage
-    public void onMessage(Session ws, Message message) {
+    public void onMessage(Message message, Session ws)
+            throws IOException, EncodeException {
         HttpSession httpSession = httpSessionMap.get(ws.getId());
         String sender = (String)httpSession.getAttribute("userid");
         message.setSender(sender);
-        message.setGroup(message.getTarget());
+        message.setRoom(message.getTarget());
         message.insertToDB();
-        this.makeRecord(message.getTarget(), message.getID());
         System.out.println("WebSocket get: " + message);
         try {
             broadcast(message, message.getTarget());
         }catch (Exception e) {
             e.printStackTrace();
+        }
+        if (message.getStatus().equals("enter")) {
+            ChangeRoomStatus(sender, message.getTarget(), 0);
+        }
+        if (message.getStatus().equals("exit")) {
+            ChangeRoomStatus(sender, message.getTarget(), 1);
         }
     }
 
@@ -65,48 +72,20 @@ public class GroupChat {
     }
 
     @OnError
-    public void error(Session ws, java.lang.Throwable throwable) {
-        String userid = (String)httpSessionMap.get(ws.getId()).getAttribute("userid");
-        System.err.println("User " + userid + " error: " + throwable.getMessage());
-        this.onClose(ws);
+    public void error(Session session, java.lang.Throwable throwable){
+        System.err.println("Guest" + session.getId() + " error: " + throwable);
+        onClose(session);
     }
 
-    private void makeRecord(String groupid, int messageid) {
+    private void broadcast(Message message, String roomid) throws EncodeException{
         DatabaseConnection dbConn = new DatabaseConnection();
         Connection conn = dbConn.getConnection();
-        String sql = "insert into group_record (groupid, messageid) values (?, ?)";
-        PreparedStatement ps = null;
-        try {
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, groupid);
-            ps.setInt(2, messageid);
-            ps.executeUpdate();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-        finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void broadcast(Message message, String groupid) throws EncodeException{
-        DatabaseConnection dbConn = new DatabaseConnection();
-        Connection conn = dbConn.getConnection();
-        String sql = "SELECT userid FROM group_belong WHERE groupid = ?";
+        String sql = "SELECT userid FROM room_status WHERE roomid = ?";
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
             ps = conn.prepareStatement(sql);
-            ps.setString(1, groupid);
+            ps.setString(1, roomid);
             rs = ps.executeQuery();
             while (rs.next()) {
                 String user = rs.getString("userid");
@@ -144,6 +123,40 @@ public class GroupChat {
             e.printStackTrace();
         } catch (EncodeException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void ChangeRoomStatus(String userid, String roomid, int status) {
+        // status == 0 enter; status == 1 exit;
+        DatabaseConnection dbConn = new DatabaseConnection();
+        Connection conn = dbConn.getConnection();
+        String sql;
+        if (status == 0) {
+            sql = "insert into room_status (userid, roomid) values (?, ?)";
+        }
+        else {
+            sql = "DELETE FROM room_status WHERE userid = ? AND roomid = ?";
+        }
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, userid);
+            ps.setString(2, roomid);
+            ps.executeUpdate();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
