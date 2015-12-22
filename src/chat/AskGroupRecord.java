@@ -5,60 +5,62 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
- * Created by Dongfang on 2015/12/15.
+ * Created by Dongfang on 2015/12/22.
  */
-@WebServlet(name = "Register", urlPatterns = {"/register"})
-public class Register extends HttpServlet {
+@WebServlet(name = "AskGroupRecord", urlPatterns = {"/askgrouprecord"})
+public class AskGroupRecord extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         ReqReader reader = new ReqReader(request.getInputStream());
         ResWriter writer = new ResWriter(response.getOutputStream());
-        String password = reader.getString("passwd");
-        String nickname = reader.getString("nickname");
-        String email = reader.getString("email");
 
-        if (password == "" || nickname == "") {
+        String username, groupid;
+        HttpSession session = request.getSession();
+        if (session.getAttribute("userid") != null) {
+            username = (String)session.getAttribute("userid");
+        }
+        else {
+            response.setHeader("Location", "/");
+            response.setStatus(401);
+            return; // no valid userid.
+        }
+        groupid = reader.getString("groupid");
+
+        if (username == "" ) {
             writer.add("status", "failed").write();
             return;
         }
 
-        try {
-            password = CipherUtil.encoderByMd5(password);
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-
         DatabaseConnection dbConn = new DatabaseConnection();
         Connection conn = dbConn.getConnection();
-        String sql = "SELECT COUNT(*) as rowCount FROM user_info";
+        String sql = "SELECT ctime, content, userid FROM group_record, message WHERE group_record.messageid == message.messageid AND groupid = ?";
+        PreparedStatement ps = null;
         ResultSet rs = null;
-        PreparedStatement ps = null, ps1 = null;
-        int username = 0;
         try {
             ps = conn.prepareStatement(sql);
+            ps.setString(1, groupid);
             rs = ps.executeQuery();
-            if (rs.next()) {
-                username = rs.getInt("rowCount");
+            ArrayList<Map<String, String>> array = new ArrayList<>();
+            while (rs.next()) {
+                Map<String, String> m = new TreeMap<>();
+                m.put("userid", rs.getString("userid"));
+                m.put("ctime", rs.getString("ctime"));
+                m.put("content", rs.getString("content"));
+                array.add(m);
             }
-            sql = "INSERT INTO user_info (userid, nickname, passwd, email) VALUES (?,?,?,?)";
-            ps1 = conn.prepareStatement(sql);
-            ps1.setInt(1, ++username);
-            ps1.setString(2, nickname);
-            ps1.setString(3, password);
-            ps1.setString(4, email);
-            ps1.executeUpdate();
-            ps1.close();
             writer.add("status", "success");
-            writer.add("username", username).write();
+            writer.add("grouprecord", array).write();
         } catch(Exception e) {
             e.printStackTrace();
         }

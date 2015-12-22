@@ -81,12 +81,6 @@ create table group_record (
     primary key (groupid, messageid)
 ) engine=innodb, charset=utf8;
 
-create table room_record (
-	roomid integer not null,
-    messageid integer not null,
-    primary key (roomid, messageid)
-) engine=innodb, charset=utf8;
-
 create table note_belong (
 	boardid integer not null,
     noteid integer not null,
