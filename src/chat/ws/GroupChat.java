@@ -33,6 +33,7 @@ public class GroupChat {
             this.error(ws, new Exception("Not a valid WebSocket connection.")); // not a valid connection.
         }
         else {
+            ws.setMaxTextMessageBufferSize(600);
             String userid = (String) httpSession.getAttribute("userid");
             httpSessionMap.put(ws.getId(), httpSession);
             sessionMap.put(userid, ws);

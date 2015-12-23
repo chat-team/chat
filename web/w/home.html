@@ -95,13 +95,13 @@
                 </div>
                 <div id="rooms" style="display: none;">
                     <ul class="list-group text-center">
-                        <li class="list-group-item text-center">
+                        <!-- <li class="list-group-item text-center">
                             <form action="#" method="post" onsubmit="return false;" ng-submit="room.Create()">
                                 <input type="text" ng-model="room.create" placeholder="new room" class="form-control">
                             </form>
-                        </li>
-                        <li class="list-group-item" ng-repeat="x in rooms"  data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.roomid }}" data-id="{{ x.roomid }}" data-kind="room" ng-click="chat.SetContext($event)">
-                            <span class="label label-default text-right">{{ x.roomid }}</span><strong>{{ x.roomid }}</strong>
+                        </li> -->
+                        <li class="list-group-item" ng-repeat="x in room.all"  data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.roomid }}" data-id="{{ x.roomid }}" data-kind="room" ng-click="chat.SetContext($event)">
+                            <strong class="text-center">{{ x.roomname }}</strong>
                         </li>
                     </ul>
                 </div>
@@ -122,9 +122,9 @@
                             </div>
                             <br />
                             <div class="row input-group text-right" ng-if="x.self">
-                                <span class="auto-scaling form-control pull-right" contenteditable="true">{{ x.content }}</span>
+                                <span class="auto-scaling form-control pull-right" contenteditable="false">{{ x.content }}</span>
                                 <span class="input-group-addon" data-toggle="tooltip" tooltip-placement="bottom" tooltip="{{ x.ctime }}">
-                                    <button class="form-control btn btn-default btn-sm">{{ userid }}&nbsp;&nbsp;<span class="glyphicon glyphicon-user"></span></button>
+                                    <button class="form-control btn btn-default btn-sm">{{ nickname }}&nbsp;&nbsp;<span class="glyphicon glyphicon-user"></span></button>
                                 </span>
                             </div>
                         </div>

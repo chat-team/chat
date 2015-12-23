@@ -6,6 +6,7 @@ import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,10 +35,11 @@ public class RoomChat {
             this.error(ws, new Exception("Not a valid WebSocket connection.")); // not a valid connection.
         }
         else {
+            ws.setMaxTextMessageBufferSize(600);
             String userid = (String) httpSession.getAttribute("userid");
             httpSessionMap.put(ws.getId(), httpSession);
             sessionMap.put(userid, ws);
-            System.out.println("User " + userid + " enter.");
+            System.out.println("User " + userid + " enter room chat.");
         }
     }
 
@@ -55,10 +57,10 @@ public class RoomChat {
         }catch (Exception e) {
             e.printStackTrace();
         }
-        if (message.getStatus().equals("enter")) {
+        if (message.getStatus() != null && message.getStatus().equals("enter")) {
             ChangeRoomStatus(sender, message.getTarget(), 0);
         }
-        if (message.getStatus().equals("exit")) {
+        if (message.getStatus() != null && message.getStatus().equals("exit")) {
             ChangeRoomStatus(sender, message.getTarget(), 1);
         }
     }
@@ -66,15 +68,17 @@ public class RoomChat {
     @OnClose
     public void onClose(Session ws) {
         String userid = (String)httpSessionMap.get(ws.getId()).getAttribute("userid");
-        System.out.println("User " + userid + " leave");
+        System.out.println("User " + userid + " leave room chat");
+        this.ChangeRoomStatus(userid, 1);
         httpSessionMap.remove(ws.getId());
         sessionMap.remove(userid);
     }
 
     @OnError
-    public void error(Session session, java.lang.Throwable throwable){
-        System.err.println("Guest" + session.getId() + " error: " + throwable);
-        onClose(session);
+    public void error(Session ws, java.lang.Throwable throwable){
+        String userid = (String)httpSessionMap.get(ws.getId()).getAttribute("userid");
+        System.err.println("User " + userid + " error: " + throwable.getStackTrace());
+        this.onClose(ws);
     }
 
     private void broadcast(Message message, String roomid) throws EncodeException{
@@ -94,6 +98,7 @@ public class RoomChat {
                     //message.updateState(true);
                 }
             }
+            System.out.println("Finish reply all.");
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -126,6 +131,34 @@ public class RoomChat {
         }
     }
 
+    private void ChangeRoomStatus(String userid, int status) throws InvalidParameterException {
+        if (userid == null || userid.length() == 0 || status == 0) {
+            throw new InvalidParameterException("Expect valid userid and the status be false");
+        }
+        DatabaseConnection dbConn = new DatabaseConnection();
+        Connection conn = dbConn.getConnection();
+        String sql = "delete from room_status where userid = ?";
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, userid);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void ChangeRoomStatus(String userid, String roomid, int status) {
         // status == 0 enter; status == 1 exit;
         DatabaseConnection dbConn = new DatabaseConnection();
@@ -145,8 +178,7 @@ public class RoomChat {
             ps.executeUpdate();
         } catch(Exception e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             try {
                 if (ps != null) {
                     ps.close();

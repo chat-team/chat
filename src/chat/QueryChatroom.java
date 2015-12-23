@@ -43,22 +43,22 @@ public class QueryChatroom extends HttpServlet {
 
         DatabaseConnection dbConn = new DatabaseConnection();
         Connection conn = dbConn.getConnection();
-        String sql = "SELECT room_status.roomid, roomname FROM room_status, chatroom WHERE room_status.roomid = chatroom.roomid and userid = ?";
+        String sql = "SELECT * FROM chatroom";
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
             ps = conn.prepareStatement(sql);
-            ps.setObject(1, username);
             rs = ps.executeQuery();
             ArrayList<Map<String, String>> array = new ArrayList<>();
             while (rs.next()) {
                 Map<String, String> m = new TreeMap<>();
                 m.put("roomid", rs.getString("roomid"));
                 m.put("roomname", rs.getString("roomname"));
+                m.put("description", rs.getString("description"));
                 array.add(m);
             }
             writer.add("status", "success");
-            writer.add("chat", array).write();
+            writer.add("room", array).write();
         } catch(Exception e) {
             e.printStackTrace();
         }

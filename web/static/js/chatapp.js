@@ -40,6 +40,7 @@ app.config(function ($httpProvider) {
 
 app.controller("HomeCtrl", function ($scope, $http, $location) {
     $scope.userid = $.cookie('userid') || '';
+    $scope.nickname = $.cookie('nickname') || '';
 
     $scope.friend = {
         Query: function () {
@@ -170,7 +171,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
                 data: { },
             }).then(
                 function (res) {
-                    
+                    $scope.room.all = res.data['room'];
                 },
                 function (res) {
                     console.log("ERROR");
@@ -201,9 +202,9 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
 
     $scope.chat = {
         socket: {
-            friendchat: new WebSocket('ws://' + location.host + '/chat/friend'),
-            groupchat: new WebSocket('ws://' + location.host + '/chat/group'),
-            roomchat: undefined,
+            friend: undefined,
+            group: undefined,
+            room: undefined,
         },
         target: {
             kind: '',
@@ -223,7 +224,8 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
         unreads: [],
 
         Connect: function () {
-            $scope.chat.socket.friendchat.onmessage = function (evt) {
+            $scope.chat.socket.friend = new WebSocket('ws://' + location.host + '/chat/friend');
+            $scope.chat.socket.friend.onmessage = function (evt) {
                 var message = JSON.parse(evt.data);
                 console.log("friend chat get message: " + JSON.stringify(message));
                 var sender = message.sender;
@@ -238,10 +240,11 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
                 }
                 $scope.$apply();
             };
-            $scope.chat.socket.friendchat.onclose = function (evt) {
+            $scope.chat.socket.friend.onclose = function (evt) {
                 console.log(evt);
             };
-            $scope.chat.socket.groupchat.onmessage = function (evt) {
+            $scope.chat.socket.group = new WebSocket('ws://' + location.host + '/chat/group');
+            $scope.chat.socket.group.onmessage = function (evt) {
                 var message = JSON.parse(evt.data);
                 console.log("group chat get message: " + JSON.stringify(message));
                 var sender = message.sender, group = message.group;
@@ -257,9 +260,47 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
                 }
                 $scope.$apply();
             };
-            $scope.chat.socket.groupchat.onclose = function (evt) {
+            $scope.chat.socket.group.onclose = function (evt) {
                 console.log(evt);
             };
+        },
+
+        EnterRoom: function (roomid) {
+            $scope.chat.socket.room = new WebSocket('ws://' + location.host + '/chat/room');
+            $scope.chat.socket.room.onopen = function (evt) {
+                $scope.chat.socket.room.send(JSON.stringify({
+                    content: $scope.nickname + ' enter.',
+                    target: roomid,
+                    status: 'enter',
+                }));
+                console.log("enter message sent");
+            };
+            $scope.chat.socket.room.onmessage = function (evt) {
+                var message = JSON.parse(evt.data);
+                console.log("room chat get message: " + JSON.stringify(message));
+                var sender = message.sender, room = message.room;
+                if (sender === $scope.userid) { return; } // ignore response message to user self.
+                if (!$scope.chat.unreads) {
+                    $scope.chat.unreads = [];
+                }
+                $scope.chat.unreads.push(message);
+                $scope.$apply();
+            };
+            $scope.chat.socket.room.onclose = function (evt) {
+                console.log(evt);
+            };
+        },
+
+        LeaveRoom: function (roomid) {
+            if (!$scope.chat.socket.room || $scope.chat.socket.room !== WebSocket.OPEN) {
+                return;
+            }
+            $scope.chat.socket.room.send(JSON.stringify({
+                content: $scope.nickname + ' leave.',
+                target: roomid,
+                status: 'exit',
+            }));
+            $scope.chat.socket.room.close();
         },
 
         Send: function () {
@@ -276,7 +317,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
                 target: id,
                 content: content,
             };
-            var socket = $scope.chat.socket[kind + "chat"];
+            var socket = $scope.chat.socket[kind];
             if (socket) {
                 console.log(message);
                 socket.send(JSON.stringify(message));
@@ -293,10 +334,19 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
             var kind = dom.attr("data-kind");
             var id = dom.attr("data-id");
             console.log("switch context: " + kind + "  " + id);
+            if (kind === 'room') {
+                if (id !== $scope.chat.target.id) {
+                    $scope.chat.LeaveRoom($scope.chat.target.id);
+                    $scope.chat.EnterRoom(id);
+                }
+            }
+            else {
+                $scope.chat.LeaveRoom(id);
+                $scope.chat.unreads = $scope.chat.log[kind][id] || [];
+                dom.children("span.badge").html('');
+            }
             $scope.chat.target.kind = kind;
             $scope.chat.target.id = id;
-            $scope.chat.unreads = $scope.chat.log[kind][id] || [];
-            dom.children("span.badge").html('');
         },
     };
 
@@ -348,6 +398,7 @@ app.controller("LoginCtrl", function ($scope, $http, $location) {
                 if (res.data['status'] === 'success') {
                     // store user ID in cookie.
                     $.cookie("userid", $scope.userid);
+                    $.cookie("nickname", res.data['nickname']);
                     $location.path("/home");
                 }
                 else {
