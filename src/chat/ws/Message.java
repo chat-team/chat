@@ -99,24 +99,18 @@ public class Message {
         ResultSet rs = null;
         try {
             // get message id.
-            String sql = "select COUNT(*) as cnt from message;";
+            String sql = "set @p0 = ?";
             ps = conn.prepareStatement(sql);
+            ps.setString(1, content);
+            ps.execute();
+            sql = "set @p1 = ?";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, sender);
+            ps.execute();
+            sql = "call add_message(@p0, @p1)";
             rs = ps.executeQuery();
             if (rs.next()) {
-                messageid = rs.getInt("cnt") + 1;
-            }
-            // insert message into database.
-            sql = "insert into message (messageid, content, userid, state) values (?, ?, ?, false)";
-            ps = conn.prepareStatement(sql);
-            ps.setInt(1, messageid);
-            ps.setString(2, content);
-            ps.setString(3, sender);
-            ps.executeUpdate();
-            sql = "select ctime from message where messageid=?";
-            ps = conn.prepareStatement(sql);
-            ps.setInt(1, messageid);
-            rs = ps.executeQuery();
-            if (rs.next()) {
+                messageid = rs.getInt("messageid");
                 ctime = rs.getString("ctime");
             }
             System.out.println("Message ID: " + messageid + " Create time: " + ctime);
