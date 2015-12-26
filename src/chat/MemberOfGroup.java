@@ -45,7 +45,7 @@ public class MemberOfGroup extends HttpServlet {
 
         DatabaseConnection dbConn = new DatabaseConnection();
         Connection conn = dbConn.getConnection();
-        String sql = "SELECT group_belong.userid, user_info.username FROM group_belong, user_info WHERE group_belong.userid = user_info.userid and groupid = ?";
+        String sql = "SELECT group_belong.userid, user_info.nickname FROM group_belong, user_info WHERE group_belong.userid = user_info.userid and groupid = ?";
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
@@ -56,7 +56,7 @@ public class MemberOfGroup extends HttpServlet {
             while (rs.next()) {
                 Map<String, String> m = new TreeMap<>();
                 m.put("userid", rs.getString("userid"));
-                m.put("username", rs.getString("username"));
+                m.put("nickname", rs.getString("nickname"));
                 array.add(m);
             }
             writer.add("status", "success");

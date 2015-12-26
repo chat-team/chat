@@ -45,7 +45,7 @@ public class MemberOfRoom extends HttpServlet {
 
         DatabaseConnection dbConn = new DatabaseConnection();
         Connection conn = dbConn.getConnection();
-        String sql = "SELECT room_status.userid, user_info.username FROM room_status, user_info WHERE room_status.userid = user_info.userid and roomid = ?";
+        String sql = "SELECT room_status.userid, user_info.nickname FROM room_status, user_info WHERE room_status.userid = user_info.userid and roomid = ?";
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
@@ -56,7 +56,7 @@ public class MemberOfRoom extends HttpServlet {
             while (rs.next()) {
                 Map<String, String> m = new TreeMap<>();
                 m.put("userid", rs.getString("userid"));
-                m.put("username", rs.getString("username"));
+                m.put("nickname", rs.getString("nickname"));
                 array.add(m);
             }
             writer.add("status", "success");

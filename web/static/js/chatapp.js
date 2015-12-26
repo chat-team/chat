@@ -83,12 +83,16 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                 $scope.friend.search = [];
             }
             else {
-                $scope.friend.search = [
-                    { userid: "1", username: "eee"},
-                    { userid: "2", username: "dddd"},
-                    { userid: "3", username: "fff"},
-                ];
-                console.log($scope.friend.search);
+                var len = $scope.friend.all.length;
+                var res = [];
+                var input = $scope.friend.find;
+                for (var i = 0; i < len; ++i) {
+                    if ($scope.friend.all[i].userid.startsWith(input)
+                            || $scope.friend.all[i].nickname.startsWith(input)) {
+                        res.push($scope.friend.all[i]);
+                    }
+                }
+                $scope.friend.search = res;
             }
         },
 
@@ -105,8 +109,13 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                 },
             }).then(
                 function (res) {
-                    $('#make_friends_modal').modal("hide");
-                    $scope.friend.Query();
+                    if (res.data['status'] === 'success') {
+                        $('#make_friends_modal').modal("hide");
+                        $scope.friend.Query();
+                    }
+                    else {
+                        $scope.friend.addresult = res.data['message'];
+                    }
                 },
                 function (res) {
                     console.log(res);
@@ -115,21 +124,20 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
         },
 
         Delete: function (userid) {
-            console.log("delete friend, id: " + userid);
-            // $http({
-            //     method: 'POST',
-            //     url: '/',
-            //     data: {
-            //         target: userid,
-            //     },
-            // }).then(
-            //     function (res) {
-            //         $scope.friend.Query();
-            //     },
-            //     function (res) {
-            //         console.log(res);
-            //     }
-            // );
+            $http({
+                method: 'POST',
+                url: '/deletefriend',
+                data: {
+                    targetid: userid,
+                },
+            }).then(
+                function (res) {
+                    $scope.friend.Query();
+                },
+                function (res) {
+                    console.log(res);
+                }
+            );
         },
     };
 
@@ -180,20 +188,49 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             );
         },
 
+        Search: function () {
+            if (!$scope.group.find || $scope.group.find.length <= 0) {
+                $scope.group.search = [];
+            }
+            else {
+                var res = [];
+                var input = $scope.group.find;
+                var len = $scope.group.admined.length;
+                for (var i = 0; i < len; ++i) {
+                    if ($scope.group.admined[i].groupid.startsWith(input)
+                            || $scope.group.admined[i].groupname.startsWith(input)) {
+                        res.push($scope.group.admined[i]);
+                    }
+                }
+                len = $scope.group.joined.length;
+                for (var i = 0; i < len; ++i) {
+                    if ($scope.group.joined[i].groupid.startsWith(input)
+                            || $scope.group.joined[i].groupname.startsWith(input)) {
+                        res.push($scope.group.joined[i]);
+                    }
+                }
+                $scope.group.search = res;
+            }
+        },
+
         Create: function () {
-            if (!$scope.group.create || $scope.group.create.length <= 0) {
+            if (!$scope.group.newname || $scope.group.newname.length <= 0) {
                 return;
             }
             $http({
                 method: "POST",
                 url: "/constructgroup",
                 data: {
-                    "groupname": $scope.group.create,
-                    "description": "description of " + $scope.group.create,
+                    "groupname": $scope.group.newname,
+                    "description": $scope.group.newdesc,
                 },
             }).then(
                 function (res) {
+                    $scope.group.createmessage = res.data['status'];
                     $scope.group.Query();
+                    $timeout(function () {
+                        $('#create_group_modal').modal("hide");
+                    }, 2000);
                 },
                 function (res) {
                     console.log("Create a new group ERROR");
@@ -222,25 +259,67 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
         },
 
         Delete: function (groupid) {
-            console.log("delete group, id: " + groupid);
-            // $http({
-            //     method: 'POST',
-            //     url: '/',
-            //     data: {
-            //         target: groupid,
-            //     },
-            // }).then(
-            //     function (res) {
-            //         $scope.group.Query();
-            //     },
-            //     function (res) {
-            //         console.log(res);
-            //     }
-            // );
+            $http({
+                method: 'POST',
+                url: '/deletegroup',
+                data: {
+                    targetid: groupid,
+                },
+            }).then(
+                function (res) {
+                    $scope.group.Query();
+                },
+                function (res) {
+                    console.log(res);
+                }
+            );
         },
     };
 
     $scope.room = {
+        note: [],
+        
+        BindContext: function () {
+            $('.context-room').contextmenu({
+                target:'#context-room-menu', 
+                before: function(e, context) {
+                    // execute code before context menu if shown
+                },
+                onItem: function(context, e) {
+                    var action = $(e.currentTarget).attr("data-action");
+                    var roomid = $(context.context).attr("data-id");
+                    if (action === "enter") {
+                        // enter.
+                        $(context.context).click();
+                    }
+                    else {
+                        // view notes.
+                        $scope.room.ViewNotes(roomid);
+                    }
+                },
+            });
+        },
+
+        ViewNotes: function (roomid) {
+            $http({
+                method: "POST",
+                url: "/shownote",
+                data: {
+                    boardid: roomid,
+                },
+            }).then(
+                function (res) {
+                    $scope.room.note = res.data['note'];
+                    $timeout(function () {
+                        $("div.modal#view_notes_modal").modal('show');
+                    });
+                },
+                function (res) {
+                    console.log(res);
+                }
+            );
+        },
+
         Query: function () {
             $http({
                 method: "POST",
@@ -249,12 +328,14 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             }).then(
                 function (res) {
                     $scope.room.all = res.data['room'];
+                    $timeout($scope.room.BindContext);
                 },
                 function (res) {
                     console.log("ERROR");
                 }
             );
         },
+
         Create: function () {
             if (!$scope.room.create || $scope.room.create.length <= 0) {
                 return;
@@ -275,26 +356,52 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                 }
             );
         },
+
+        Search: function () {
+            if (!$scope.room.find || $scope.room.find.length <= 0) {
+                $scope.room.search = [];
+            }
+            else {
+                var len = $scope.room.all.length;
+                var res = [];
+                var input = $scope.room.find;
+                for (var i = 0; i < len; ++i) {
+                    if ($scope.room.all[i].roomid.startsWith(input)
+                            || $scope.room.all[i].roomname.startsWith(input)) {
+                        res.push($scope.room.all[i]);
+                    }
+                }
+                $scope.room.search = res;
+            }
+        },
     };
 
     $scope.title = {
         text: '',
         kind: '',
         id: '',
-        member: ["aaa", "bbb", "ccc", "ddd", "eee", "aaa1", "bbb2", "ccc3", "ddd4", 
-            "eee16", "aaa15", "bbb12", "ccc11", "ddd10", "eee9", "aaa8", "bbb7", "ccc6", "ddd5", 
-            "eee17", "aaa14", "bbb13", "ccc19", "ddd18", "eee20"],
+        member: [],
 
         Query: function ($event) {
             var dom = $($event.currentTarget);
-            // if ($scope.title.kind === "friend") {
-            //     return;
-            // }
-            // $http({
-            //     method: "POST",
-            //     url: "/"
-            // })
-            // dom.attr("data-content", $("div#member")[0].outerHTML);
+            if ($scope.title.kind === "friend") {
+                return;
+            }
+            $http({
+                method: "POST",
+                url: $scope.title.kind === "group" ? "/memberofgroup" : "/memberofroom",
+                data: {
+                    targetid: $scope.chat.target.id,
+                },
+            }).then(
+                function (res) {
+                    $scope.title.member = res.data['member'];
+                    $timeout(function () { dom.attr("data-content", $("div#member").html()); });
+                },
+                function (res) {
+                    console.log("ERROR");
+                }
+            );
         },
     };
 
@@ -494,7 +601,6 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             $(nav).addClass("active");
             $event.preventDefault();
         },
-
     };
 });
 
