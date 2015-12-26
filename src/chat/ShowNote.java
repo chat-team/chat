@@ -5,63 +5,62 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
- * Created by Dongfang on 2015/12/15.
+ * Created by Dongfang on 2015/12/26.
  */
-@WebServlet(name = "Register", urlPatterns = {"/register"})
-public class Register extends HttpServlet {
+@WebServlet(name = "ShowNote", urlPatterns = {"/shownote"})
+public class ShowNote extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         ReqReader reader = new ReqReader(request.getInputStream());
         ResWriter writer = new ResWriter(response.getOutputStream());
-        String password = reader.getString("passwd");
-        String nickname = reader.getString("nickname");
-        String email = reader.getString("email");
 
-        if (password == "" || nickname == "") {
+        String username, boardid;
+        HttpSession session = request.getSession();
+        if (session.getAttribute("userid") != null) {
+            username = (String)session.getAttribute("userid");
+        }
+        else {
+            response.setHeader("Location", "/");
+            response.setStatus(401);
+            return; // no valid userid.
+        }
+        boardid = reader.getString("boardid");
+
+        if (username == "" || boardid == "" ) {
             writer.add("status", "failed").write();
             return;
         }
 
-        try {
-            password = CipherUtil.encoderByMd5(password);
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-
         DatabaseConnection dbConn = new DatabaseConnection();
         Connection conn = dbConn.getConnection();
-        String sql = "set @p0 = ?";
-        ResultSet rs = null;
+        String sql = "SELECT ctime, content, userid FROM note_belong, note WHERE note_belong.noteid == note.noteid AND boardid = ?";
         PreparedStatement ps = null;
-        int username = 0;
+        ResultSet rs = null;
         try {
             ps = conn.prepareStatement(sql);
-            ps.setString(1, nickname);
-            ps.execute();
-            sql = "set @p1 = ?";
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, password);
-            ps.execute();
-            sql = "set @p2 = ?";
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, email);
-            ps.execute();
-            sql = "call add_user(@p0, @p1, @p2)";
+            ps.setString(1, boardid);
             rs = ps.executeQuery();
-            if (rs.next()) {
-                username = rs.getInt("userid");
+            ArrayList<Map<String, String>> array = new ArrayList<>();
+            while (rs.next()) {
+                Map<String, String> m = new TreeMap<>();
+                m.put("userid", rs.getString("userid"));
+                m.put("ctime", rs.getString("ctime"));
+                m.put("content", rs.getString("content"));
+                array.add(m);
             }
             writer.add("status", "success");
-            writer.add("username", username).write();
+            writer.add("note", array).write();
         } catch(Exception e) {
             e.printStackTrace();
         }
