@@ -38,11 +38,30 @@ app.config(function ($httpProvider) {
     $httpProvider.interceptors.push('RedirectInterceptor');
 });
 
-app.controller("HomeCtrl", function ($scope, $http, $location) {
+app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
     $scope.userid = $.cookie('userid') || '';
     $scope.nickname = $.cookie('nickname') || '';
 
     $scope.friend = {
+        BindContext: function () {
+            $('.context-friend').contextmenu({
+                target:'#context-friend-menu', 
+                before: function(e, context) {
+                    // execute code before context menu if shown
+                },
+                onItem: function(context, e) {
+                    var action = $(e.currentTarget).attr("data-action");
+                    var userid = $(context.context).attr("data-id");
+                    if (action === "chat") {
+                        $(context.context).click();
+                    }
+                    else {
+                        $scope.friend.Delete(userid);
+                    }
+                },
+            });
+        },
+
         Query: function () {
             $http({
                 method: "POST",
@@ -51,6 +70,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
             }).then(
                 function (res) {
                     $scope.friend.all = res.data.friend;
+                    $timeout($scope.friend.BindContext);
                 },
                 function (res) {
                     console.log("ERROR");
@@ -93,9 +113,47 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
                 }
             );
         },
+
+        Delete: function (userid) {
+            console.log("delete friend, id: " + userid);
+            // $http({
+            //     method: 'POST',
+            //     url: '/',
+            //     data: {
+            //         target: userid,
+            //     },
+            // }).then(
+            //     function (res) {
+            //         $scope.friend.Query();
+            //     },
+            //     function (res) {
+            //         console.log(res);
+            //     }
+            // );
+        },
     };
 
     $scope.group = {
+        BindContext: function () {
+            $('.context-group').contextmenu({
+                target:'#context-group-menu', 
+                before: function(e, context) {
+                    // execute code before context menu if shown
+                },
+                onItem: function(context, e) {
+                    // execute on menu item selection
+                    var action = $(e.currentTarget).attr("data-action");
+                    var groupid = $(context.context).attr("data-id");
+                    if (action === "chat") {
+                        $(context.context).click();
+                    }
+                    else {
+                        $scope.group.Delete(groupid);
+                    }
+                }
+            });
+        },
+
         Query: function () {
             $http({
                 method: "POST",
@@ -114,6 +172,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
                             $scope.group.joined.push(g);
                         }
                     }
+                    $timeout($scope.group.BindContext);
                 },
                 function (res) {
                     console.log("Query all groups ERROR");
@@ -161,6 +220,24 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
                 }
             );
         },
+
+        Delete: function (groupid) {
+            console.log("delete group, id: " + groupid);
+            // $http({
+            //     method: 'POST',
+            //     url: '/',
+            //     data: {
+            //         target: groupid,
+            //     },
+            // }).then(
+            //     function (res) {
+            //         $scope.group.Query();
+            //     },
+            //     function (res) {
+            //         console.log(res);
+            //     }
+            // );
+        },
     };
 
     $scope.room = {
@@ -200,6 +277,27 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
         },
     };
 
+    $scope.title = {
+        text: '',
+        kind: '',
+        id: '',
+        member: ["aaa", "bbb", "ccc", "ddd", "eee", "aaa1", "bbb2", "ccc3", "ddd4", 
+            "eee16", "aaa15", "bbb12", "ccc11", "ddd10", "eee9", "aaa8", "bbb7", "ccc6", "ddd5", 
+            "eee17", "aaa14", "bbb13", "ccc19", "ddd18", "eee20"],
+
+        Query: function ($event) {
+            var dom = $($event.currentTarget);
+            // if ($scope.title.kind === "friend") {
+            //     return;
+            // }
+            // $http({
+            //     method: "POST",
+            //     url: "/"
+            // })
+            // dom.attr("data-content", $("div#member")[0].outerHTML);
+        },
+    };
+
     $scope.chat = {
         socket: {
             friend: undefined,
@@ -234,7 +332,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
                 }
                 else {
                     var badge = $("span#badge-friend-" + sender);
-                    badge.html(eval(badge.html().length > 0 ? badge.html() : 0) + 1);
+                    badge.html(eval((badge.html() && badge.html().length > 0) ? badge.html() : 0) + 1);
                     $scope.chat.log['friend'][sender] = $scope.chat.log['friend'][sender] || [];
                     $scope.chat.log['friend'][sender].push(message);
                 }
@@ -254,7 +352,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
                 }
                 else {
                     var badge = $("span#badge-group-" + group);
-                    badge.html(eval(badge.html().length > 0 ? badge.html() : 0) + 1);
+                    badge.html(eval((badge.html() && badge.html().length > 0) ? badge.html() : 0) + 1);
                     $scope.chat.log['group'][group] = $scope.chat.log['group'][group] || [];
                     $scope.chat.log['group'][group].push(message); // store it.
                 }
@@ -292,7 +390,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
         },
 
         LeaveRoom: function (roomid) {
-            if (!$scope.chat.socket.room || $scope.chat.socket.room !== WebSocket.OPEN) {
+            if (!$scope.chat.socket.room || $scope.chat.socket.room.readyState !== WebSocket.OPEN) {
                 return;
             }
             $scope.chat.socket.room.send(JSON.stringify({
@@ -345,6 +443,16 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
                 $scope.chat.unreads = $scope.chat.log[kind][id] || [];
                 dom.children("span.badge").html('');
             }
+            // toggle
+            $("li.select").each(function (idx) {
+                $(this).removeClass("active");
+            });
+            dom.addClass("active");
+            $scope.title.text = kind + "  " + dom.attr("data-name");
+            $scope.title.kind = kind;
+            $scope.title.id = id;
+
+            // store state
             $scope.chat.target.kind = kind;
             $scope.chat.target.id = id;
         },
@@ -364,6 +472,13 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
                 var dom = $(evt.currentTarget);
                 dom.scrollTop(dom.prop("scrollHeight"));
             });
+
+            $("[data-toggle='popover']").popover({
+                html: true,
+                content: function () {
+                    return $("div#member").html();
+                },
+            });
         },
 
         // toggle tab.
@@ -373,10 +488,10 @@ app.controller("HomeCtrl", function ($scope, $http, $location) {
             })
             var nav = $event.currentTarget;
             $("#" + $(nav).attr("data-page")).fadeIn(100);
-            $("#snav").children().each(function (idx) {
+            $("li.nav-item").each(function (idx) {
                 $(this).removeClass("active");
             });
-            $(nav).parent().addClass("active");
+            $(nav).addClass("active");
             $event.preventDefault();
         },
 
