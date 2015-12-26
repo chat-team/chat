@@ -1,47 +1,66 @@
-<div class="row text-center">
+<div class="row text-center main-container">
     <div class="panel panel-default panel-home col-md-12 col-sm-12 fill">
-        <div class="col-md-3 col-sm-3 panel panel-home" ng-init="init.Initial()" style="height: 640px;">
+        <div class="col-md-3 col-sm-3 col-xs-12 panel panel-home" ng-init="init.Initial()" style="height: 640px;">
             <div class="row panel-heading">
-                <ul id="snav" class="nav nav-tabs nav-justified">
-                   <li class="active"><a href="#/home" data-page="friends" ng-click="init.Toggle($event)">Friends</a></li>
-                   <li><a href="#/home" data-page="groups" ng-click="init.Toggle($event)">Groups</a></li>
-                   <li><a href="#/home" data-page="rooms" ng-click="init.Toggle($event)">Rooms</a></li>
+                <ul id="snav col-md-3 col-sm-3 col-xs-12" class="nav nav-tabs nav-justified">
+                    <li class="active nav-item" data-page="friends" ng-click="init.Toggle($event)" >
+                        <a href="#/home">
+                            <span class="glyphicon glyphicons-user" data-toggle="tooltip" tooltip-placement="bottom" tooltip="好友" ></span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-page="groups" ng-click="init.Toggle($event)">
+                        <a href="#/home">
+                            <span class="glyphicon glyphicons-group" data-toggle="tooltip" tooltip-placement="bottom" tooltip="群组" ></span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-page="rooms" ng-click="init.Toggle($event)" >
+                        <a href="#/home">
+                            <span class="glyphicon glyphicons-chat" data-toggle="tooltip" tooltip-placement="bottom" tooltip="聊天室" ></span>
+                        </a>
+                    </li>
                 </ul>
             </div>
             <div class="row" id="spage">
                 <div id="friends" style="display: block;">
-                    <ul class="list-group text-center">
+                    <ul class="list-group text-center all-item-group">
                         <li class="list-group-item text-center">
-                            <input type="text" ng-model="friend.find" placeholder="new friend" class="form-control" ng-change="friend.Search(this)">
+                            <input type="text" ng-model="friend.find" placeholder="查找好友" class="form-control" ng-change="friend.Search(this)">
                         </li>
                         <li class="list-group-item" ng-repeat="x in friend.search" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.userid }}" data-id="{{ x.userid }}">
                             <span>{{ x.nickname }}</span>
                         </li>
-                        <li class="list-group-item" ng-repeat="x in friend.all" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.userid }}" data-id="{{ x.userid }}" data-kind="friend" ng-click="chat.SetContext($event)">
+                        <li class="list-group-item select context-friend" data-toggle="context" data-target="#context-friend-menu" ng-repeat="x in friend.all" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.userid }}" data-id="{{ x.userid }}" data-kind="friend" data-name="{{ x.nickname }}" ng-click="chat.SetContext($event)">
                             <span>{{ x.nickname }}</span><span class="badge" id="badge-friend-{{ x.userid }}"></span>
                         </li>
                         <li class="list-group-item" data-toggle="modal" data-target="#make_friends_modal">
-                            <span class="glyphicon glyphicon-plus"></span>
+                            <span class="glyphicon glyphicons-user_add"></span>
                         </li>
                     </ul>
+                    <div id="context-friend-menu" style="position: absolute; z-index: 9999; top: 389px; left: 558px;" class="">
+                        <ul class="dropdown-menu" role="menu">
+                            <li data-action="chat"><a tabindex="-1">发起聊天</a></li>
+                            <li class="divider"></li>
+                            <li data-action="delete"><a tabindex="-1">删除好友</a></li>
+                        </ul>
+                    </div>
                     <div class="modal fade" id="make_friends_modal" tabindex="-1", role="dialog" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times</button>
-                                    <h4 class="modal-title">Make Friends</h4>
+                                    <h4 class="modal-title">添加好友</h4>
                                 </div>
                                 <div class="modal-body">
                                     <form class="form" role="form" action="#" method="post" accept-charset="utf-8" onsubmit="return false;" ng-submit="friend.MakeF()">
                                         <div class="form-group">
-                                            <input class="form-control" type="text" value="{{ friend.find }}" placeholder="Friend ID" ng-model="friend.targetid">
+                                            <input class="form-control" type="text" value="{{ friend.find }}" placeholder="好友ID" ng-model="friend.targetid">
                                         </div>
                                         <div class="form-group btn-group btn-group-justified" role="group">
                                             <div class="btn-group" role="group">
-                                                <button type="button" class="from-control btn btn-default" data-dismiss="modal">Cancel</button>
+                                                <button type="button" class="from-control btn btn-default" data-dismiss="modal">取消</button>
                                             </div>
                                             <div class="btn-group" role="group">
-                                                <button type="submit" class="from-control btn btn-primary">Send</button>
+                                                <button type="submit" class="from-control btn btn-primary">发送请求</button>
                                             </div>
                                         </div>
                                     </form>
@@ -54,18 +73,18 @@
                     <div class="panel-group" id="accordion">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <a data-toggle="collapse" data-parent="#accordion" href="#admined-groups" target="_self" >Admined Groups</a>
+                                <a data-toggle="collapse" data-parent="#accordion" href="#admined-groups" target="_self" >我的群组</a>
                             </div>
                             <div id="admined-groups" class="panel-collapse collapse in">
                                 <div class="panel-body">
-                                    <ul class="list-group text-center">
+                                    <ul class="list-group text-center all-item-group">
                                         <li class="list-group-item text-center">
                                             <form action="#" method="post" onsubmit="return false;" ng-submit="group.Create()">
                                                 <!--<span class="glyphicon glyphicon-plus"></span>-->
-                                                <input type="text" ng-model="group.create" placeholder="create new group" class="form-control">
+                                                <input type="text" ng-model="group.create" placeholder="创建群组" class="form-control">
                                             </form>
                                         </li>
-                                        <li class="list-group-item text-center" ng-repeat="x in group.admined" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-id="{{ x.groupid }}" data-kind="group"  ng-click="chat.SetContext($event)">
+                                        <li class="list-group-item select context-group" data-toggle="context" data-target="#context-group-menu" ng-repeat="x in group.admined" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-id="{{ x.groupid }}" data-kind="group" data-name="{{ x.groupname }}" ng-click="chat.SetContext($event)">
                                             <strong class="text-center">{{ x.groupname }}</strong><span class="badge" id="badge-group-{{ x.groupid }}"></span>
                                         </li>
                                     </ul>
@@ -74,33 +93,40 @@
                         </div>
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <a data-toggle="collapse" data-parent="#accordion" href="#joined-groups" target="_self">Joined Groups</a>
+                                <a data-toggle="collapse" data-parent="#accordion" href="#joined-groups" target="_self">普通群组</a>
                             </div>
                             <div id="joined-groups" class="panel-collapse collapse">
                                 <div class="panel-body">
-                                    <ul class="list-group text-center">
+                                    <ul class="list-group text-center all-item-group">
                                         <li class="list-group-item text-center">
                                             <form action="#" method="post" onsubmit="return false;" ng-submit="group.Join()">
                                                 <input type="text" ng-model="group.search" placeholder="new group" class="form-control">
                                             </form>
                                         </li>
-                                        <li class="list-group-item text-center" ng-repeat="x in group.joined" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-id="{{ x.groupid }}" data-kind="group" ng-click="chat.SetContext($event)">
+                                        <li class="list-group-item select context-group" data-toggle="context" data-target="#context-group-menu" ng-repeat="x in group.joined" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-id="{{ x.groupid }}" data-kind="group" data-name="{{ x.groupname }}" ng-click="chat.SetContext($event)">
                                             <strong class="text-center">{{ x.groupname }}</strong><span class="badge" id="badge-group-{{ x.groupid }}"></span>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
+                        <div id="context-group-menu" style="position: absolute; z-index: 9999; top: 389px; left: 558px;" class="">
+                        <ul class="dropdown-menu" role="menu">
+                            <li data-action="chat"><a tabindex="-1">发起聊天</a></li>
+                            <li class="divider"></li>
+                            <li data-action="delete"><a tabindex="-1">删除群组</a></li>
+                        </ul>
+                    </div>
                     </div>
                 </div>
                 <div id="rooms" style="display: none;">
-                    <ul class="list-group text-center">
+                    <ul class="list-group text-center all-item-group">
                         <!-- <li class="list-group-item text-center">
                             <form action="#" method="post" onsubmit="return false;" ng-submit="room.Create()">
                                 <input type="text" ng-model="room.create" placeholder="new room" class="form-control">
                             </form>
                         </li> -->
-                        <li class="list-group-item" ng-repeat="x in room.all"  data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.roomid }}" data-id="{{ x.roomid }}" data-kind="room" ng-click="chat.SetContext($event)">
+                        <li class="list-group-item select" ng-repeat="x in room.all"  data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.roomid }}" data-id="{{ x.roomid }}" data-kind="room" data-name="{{ x.roomname }}" ng-click="chat.SetContext($event)">
                             <strong class="text-center">{{ x.roomname }}</strong>
                         </li>
                     </ul>
@@ -108,8 +134,21 @@
             </div>
         </div>
         
-        <div class="col-md-9 col-sm-9 col-xs-9 col-lg-9 text-center panel panel-home">
+        <div class="col-md-9 col-sm-9 col-xs-12 col-lg-9 text-center panel panel-home">
             <div style="height: 640px;">
+                <span class="form-control btn btn-info" data-kind="{{ title.kind }}" data-id="{{ title.id }}" ng-bind="title.text" ng-click="title.Query($event)" data-container="#member-containter" data-toggle="popover" tabindex="0" role="button" data-placement="bottom" popover-html-unsafe><!-- data-trigger="focus" -->
+                </span>
+                <div id="member" style="display: none;">
+                    <div class="row">
+                        <div class="col-sm-2 col-md-2 col-xs-4 col-lg-2 text-center" ng-repeat="x in title.member">
+                            <span><span class="glyphicon glyphicon-user"></span><br /> {{ x }}</span>
+                            <br />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div id="member-containter" class="col-md-10 col-sm-10 col-xs-12 col-lg-10"></div>
+                </div>
                 <div class="chatting">
                     <form role="form">
                         <div ng-repeat="x in chat.unreads">
@@ -118,11 +157,27 @@
                                 <span class="input-group-addon" data-toggle="tooltip" tooltip-placement="bottom" tooltip="{{ x.ctime }}">
                                     <button class="form-control btn btn-default btn-sm"><span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;{{ x.sender }}</button>
                                 </span>
-                                <span class="auto-scaling form-control pull-left" contenteditable="false">{{ x.content }}</span>
+                                <div class="messagebox message-left pull-left">
+                                    <div class="arrow">
+                                        <div class="outer"></div>
+                                        <div class="inner"></div>
+                                    </div>
+                                    <div class="message-body">
+                                        <p>{{ x.content }}</p>
+                                    </div>
+                                </div>
                             </div>
                             <br />
                             <div class="row input-group text-right" ng-if="x.self">
-                                <span class="auto-scaling form-control pull-right" contenteditable="false">{{ x.content }}</span>
+                                <div class="messagebox message-right pull-right">
+                                    <div class="message-body">
+                                        <p>{{ x.content }}</p>
+                                    </div>
+                                    <div class="arrow">
+                                        <div class="outer"></div>
+                                        <div class="inner"></div>
+                                    </div>
+                                </div>
                                 <span class="input-group-addon" data-toggle="tooltip" tooltip-placement="bottom" tooltip="{{ x.ctime }}">
                                     <button class="form-control btn btn-default btn-sm">{{ nickname }}&nbsp;&nbsp;<span class="glyphicon glyphicon-user"></span></button>
                                 </span>
@@ -130,7 +185,6 @@
                         </div>
                     </form>
                 </div>
-                
                 <div>
                     <form action="#" method="post" onsubmit="return false;" ng-submit="chat.Send()" style="padding-bottom: 0px;">
                         <div class="input-group">
@@ -145,4 +199,5 @@
         </div>
     </div>
 </div>
+
 

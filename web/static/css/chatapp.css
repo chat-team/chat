@@ -98,7 +98,6 @@ body {
     border-color: #1CA347;
 }
 
-
 .panel-home {
     border: 1px solid orange;
     -webkit-box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.2);
@@ -114,16 +113,21 @@ div.model#add_friend_modal {
 .auto-scaling {
     width: auto !important;
     height: auto !important;
-    max-width: 600px;
+    max-width: 600px !important;
 /*    max-width: -moz-calc(100% - 100px);
     max-width: -webkit-calc(100% - 100px);
     max-width: calc(100% - 100px);*/
 }
 
+ul.all-item-group {
+    max-height: 440px;
+    overflow-y: auto;
+}
+
 div.chatting {
-    height: 600px;
-    min-height: 600px;
-    max-height: 600px;
+    height: 560px;
+    min-height: 560px;
+    max-height: 560px;
     overflow-y: auto;
     overflow-x: hidden;
     padding: 5px 10px 10px 10px;
@@ -139,4 +143,104 @@ div.chatting {
 .tooltip {
     max-width: 100px !important;
 }
+
+
+#member-containter > .popover {
+    width: 90%;
+    min-width: 90%;
+}
+
+/* Message box starts here */
+.messagebox {
+    clear: both;
+    position: relative;
+}
+
+.messagebox .message-body {
+    float: left;
+    height: auto;
+    border: 1px solid #CCC;
+    background-color: #ffffff;
+    border: 1px solid #000000;
+    padding: 7px 7px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -o-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.messagebox .message-body p {
+    margin: 0;
+    width: auto !important;
+    max-width: 600px !important;
+}
+
+.message-left .arrow {
+    width: 12px;
+    height: 20px;
+    overflow: hidden;
+    position: relative;
+    float: left;
+    top: 6px;
+    right: -1px;
+}
+
+.message-right .arrow {
+    width: 12px;
+    height: 20px;
+    overflow: hidden;
+    position: relative;
+    float: left;
+    top: 6px;
+    left: -1px;
+}
+
+.message-left .arrow .outer {
+    width: 0;
+    height: 0;
+    border-right: 20px solid #000000;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.message-right .arrow .outer {
+    width: 0;
+    height: 0;
+    border-left: 20px solid #000000;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.message-left .arrow .inner {
+    width: 0;
+    height: 0;
+    border-right: 20px solid #ffffff;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    position: absolute;
+    top: 0;
+    left: 2px;
+}
+
+.message-right .arrow .inner {
+    width: 0;
+    height: 0;
+    border-left: 20px solid #ffffff;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    position: absolute;
+    top: 0;
+    right: 2px;
+}
+
+
+
+
+
 
