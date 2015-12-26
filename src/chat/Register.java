@@ -39,24 +39,27 @@ public class Register extends HttpServlet {
 
         DatabaseConnection dbConn = new DatabaseConnection();
         Connection conn = dbConn.getConnection();
-        String sql = "SELECT COUNT(*) as rowCount FROM user_info";
+        String sql = "set @p0 = ?";
         ResultSet rs = null;
-        PreparedStatement ps = null, ps1 = null;
+        PreparedStatement ps = null;
         int username = 0;
         try {
             ps = conn.prepareStatement(sql);
+            ps.setString(1, nickname);
+            ps.execute();
+            sql = "set @p1 = ?";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, password);
+            ps.execute();
+            sql = "set @p2 = ?";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, email);
+            ps.execute();
+            sql = "call add_user(@p0, @p1, @p2)";
             rs = ps.executeQuery();
             if (rs.next()) {
-                username = rs.getInt("rowCount");
+                username = rs.getInt("userid");
             }
-            sql = "INSERT INTO user_info (userid, nickname, passwd, email) VALUES (?,?,?,?)";
-            ps1 = conn.prepareStatement(sql);
-            ps1.setInt(1, ++username);
-            ps1.setString(2, nickname);
-            ps1.setString(3, password);
-            ps1.setString(4, email);
-            ps1.executeUpdate();
-            ps1.close();
             writer.add("status", "success");
             writer.add("username", username).write();
         } catch(Exception e) {
