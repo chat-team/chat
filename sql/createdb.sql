@@ -97,3 +97,16 @@ CREATE TRIGGER add_group
 AFTER INSERT ON group_info
 FOR EACH ROW
 insert into group_belong (groupid, userid) values (new.groupid, new.admin);
+
+CREATE TRIGGER del_friend
+AFTER DELETE ON friend
+FOR EACH ROW
+DELETE FROM chat_record WHERE chat_record.useraid = old.usraid AND chat_record.userbid = old.userbid;
+
+CREATE TRIGGER del_group
+AFTER DELETE ON group_info
+FOR EACH ROW
+BEGIN
+DELETE FROM group_belong WHERE group_belong.groupid = old.groupid;
+DELETE FROM group_record WHERE group_record.groupid = old.groupid;
+END;
