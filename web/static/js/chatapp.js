@@ -147,7 +147,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                         $scope.friend.Query();
                         $timeout(function () {
                             $('#make_friends_modal').modal("hide");
-                        }, 1000);
+                        }, 500);
                     }
                     else {
                         $scope.friend.addresult = res.data['message'];
@@ -304,7 +304,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                     $scope.group.Query();
                     $timeout(function () {
                         $('#create_group_modal').modal("hide");
-                    }, 1000);
+                    }, 500);
                 },
                 function (res) {
                     console.log("Create a new group ERROR");
@@ -425,6 +425,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                             console.log(res);
                         }
                     );
+                    $scope.room.newnote = "";
                 },
                 function (res) {
                     console.log(res);
@@ -715,7 +716,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                 html: true,
                 // trigger: 'manual',
                 content: function () { return $("div#member").html(); },
-                delay: { "show": 1000, "hide": 100 },
+                delay: { "show": 500, "hide": 100 },
             });
         },
 

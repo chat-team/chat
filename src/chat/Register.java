@@ -56,6 +56,7 @@ public class Register extends HttpServlet {
             ps.setString(1, email);
             ps.execute();
             sql = "call add_user(@p0, @p1, @p2)";
+            ps = conn.prepareStatement(sql);
             rs = ps.executeQuery();
             if (rs.next()) {
                 username = rs.getInt("userid");

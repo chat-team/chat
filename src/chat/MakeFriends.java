@@ -38,9 +38,15 @@ public class MakeFriends extends HttpServlet {
 
         targetid = reader.getString("targetid");
 
-        if (username == "" || targetid == "" || username == targetid) {
+        if (username == "" || targetid == "") {
             writer.add("status", "failed");
             writer.add("message", "invalid input").write();
+            return;
+        }
+
+        if (username.equals(targetid)) {
+            writer.add("status", "failed");
+            writer.add("message", "can't add yourself.").write();
             return;
         }
 

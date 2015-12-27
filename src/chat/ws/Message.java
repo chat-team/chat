@@ -108,6 +108,7 @@ public class Message {
             ps.setString(1, sender);
             ps.execute();
             sql = "call add_message(@p0, @p1)";
+            ps = conn.prepareStatement(sql);
             rs = ps.executeQuery();
             if (rs.next()) {
                 messageid = rs.getInt("messageid");
