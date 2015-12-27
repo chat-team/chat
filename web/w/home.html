@@ -26,14 +26,14 @@
                         <li class="list-group-item text-center">
                             <input type="text" ng-model="friend.find" placeholder="查找好友" class="form-control" ng-change="friend.Search()">
                         </li>
-                        <li class="list-group-item search-result" ng-repeat="x in friend.search" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.userid }}" data-id="{{ x.userid }}" ng-click="friend.SearchClick($event)">
-                            <span>{{ x.nickname }}</span>
+                        <li class="list-group-item search-result" ng-repeat="x in friend.search" data-id="{{ x.userid }}" ng-click="friend.SearchClick($event)">
+                            <strong data-toggle="tooltip" tooltip-placement="left" tooltip="ID: {{ x.userid }}" >{{ x.nickname }}</strong>
                         </li>
-                        <li class="list-group-item search-result" data-toggle="modal" data-target="#make_friends_modal" ng-if="friend.find">
+                        <li class="list-group-item search-result" data-toggle="modal" ng-click="friend.Find($event)" ng-if="friend.find"> <!-- data-target="#make_friends_modal" -->
                             <span class="glyphicon glyphicons-user_add">&nbsp;&nbsp;查找更多</span>
                         </li>
-                        <li class="list-group-item select context-friend" data-toggle="context" data-target="#context-friend-menu" ng-repeat="x in friend.all" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.userid }}" data-id="{{ x.userid }}" data-kind="friend" data-name="{{ x.nickname }}" ng-click="chat.SetContext($event)">
-                            <strong>{{ x.nickname }}</strong>
+                        <li class="list-group-item select context-friend" data-toggle="context" data-target="#context-friend-menu" ng-repeat="x in friend.all" data-id="{{ x.userid }}" data-kind="friend" data-name="{{ x.nickname }}" ng-click="chat.SetContext($event)">
+                            <strong data-toggle="tooltip" tooltip-placement="left" tooltip="ID: {{ x.userid }}">{{ x.nickname }}</strong>
                             <span class="badge" id="badge-friend-{{ x.userid }}"></span>
                         </li>
                     </ul>
@@ -44,7 +44,54 @@
                             <li data-action="delete"><a tabindex="-1">删除好友</a></li>
                         </ul>
                     </div>
-                    <div class="modal fade" id="make_friends_modal" tabindex="-1", role="dialog" aria-hidden="true">
+
+                    <div class="modal fade" id="make_friends_modal" tabindex"-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times</button>
+                                    <h4 class="modal-title">查找好友结果</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-sm-2 col-md-2 col-xs-4 col-lg-2 text-center" ng-repeat="x in friend.found" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.userid }}" data-id="{{ x.userid }}" ng-click="friend.SetTarget($event)">
+                                            <span><span class="glyphicon glyphicon-user"></span><br /> {{ x.nickname }}</span>
+                                            <br />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <!-- space -->
+                                </div>
+                                <div class="modal-header">
+                                    <h4 class="modal-title">添加好友</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form class="form" role="form" action="#" method="post" accept-charset="utf-8" onsubmit="return false;" ng-submit="friend.MakeF()">
+                                        <div class="form-group">
+                                            <input class="form-control" type="text" value="" placeholder="好友ID" ng-model="friend.targetid">
+                                        </div>
+                                        <div ng-if="friend.addmessage">
+                                            <span ng-bind="friend.addmessage" class="form-control alert alert-info text-center"></span>
+                                        </div>
+                                        <div ng-if="friend.addresult">
+                                            <span ng-bind="friend.addresult" class="form-control alert alert-danger text-center"></span>
+                                        </div>
+                                        <div class="form-group btn-group btn-group-justified" role="group">
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="from-control btn btn-default" data-dismiss="modal">取消</button>
+                                            </div>
+                                            <div class="btn-group" role="group">
+                                                <button type="submit" class="from-control btn btn-primary">发送请求</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- <div class="modal fade" id="make_friends_modal" tabindex="-1" role="dialog" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -71,7 +118,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div id="groups" style="display: none;">
                     <ul class="list-group text-center all-item-group">
@@ -81,7 +128,7 @@
                         <li class="list-group-item search-result" ng-repeat="x in group.search" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-id="{{ x.groupid }}" ng-click="group.SearchClick($event)">
                             <span>{{ x.groupname }}</span>
                         </li>
-                        <li class="list-group-item search-result" data-toggle="modal" data-target="#join_group_modal" ng-if="group.find">
+                        <li class="list-group-item search-result" data-toggle="modal" ng-click="group.Find($event)" ng-if="group.find"> <!-- data-target="#join_group_modal" -->
                             <span class="glyphicon glyphicons-user_add">&nbsp;&nbsp;查找更多</span>
                         </li>
 
@@ -124,7 +171,7 @@
                             <li data-action="delete"><a tabindex="-1">删除群组</a></li>
                         </ul>
                     </div>
-                    <div class="modal fade" id="create_group_modal" tabindex="-1", role="dialog" aria-hidden="true">
+                    <div class="modal fade" id="create_group_modal" tabindex="-1" role="dialog" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -160,11 +207,25 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal fade" id="join_group_modal" tabindex="-1", role="dialog" aria-hidden="true">
+                    <div class="modal fade" id="join_group_modal" tabindex="-1" role="dialog" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times</button>
+                                    <h4 class="modal-title">查找群组结果</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-sm-2 col-md-2 col-xs-4 col-lg-2 text-center" ng-repeat="x in group.found" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-id="{{ x.groupid }}" ng-click="group.SetTarget($event)">
+                                            <span><span class="glyphicon glyphicon-user"></span><br /> {{ x.groupname }}</span>
+                                            <br />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <!-- space -->
+                                </div>
+                                <div class="modal-header">
                                     <h4 class="modal-title">加入群组</h4>
                                 </div>
                                 <div class="modal-body">
@@ -260,7 +321,9 @@
         
         <div class="col-md-9 col-sm-9 col-xs-12 col-lg-9 text-center panel panel-home">
             <div style="height: 640px;">
-                <span class="form-control btn btn-info" data-kind="{{ title.kind }}" data-id="{{ title.id }}" ng-bind="title.text" ng-click="title.Query($event)" data-container="#member-containter" data-toggle="popover" tabindex="0" role="button" data-placement="bottom" popover-html-unsafe><!-- data-trigger="focus" -->
+                <span class="form-control btn btn-info" ng-if="chat.target.kind != 'group' && chat.target.kind != 'room'" data-kind="{{ title.kind }}" data-id="{{ title.id }}" ng-bind="title.text">
+                </span>
+                <span class="form-control btn btn-info" ng-if="chat.target.kind == 'group' || chat.target.kind == 'room'" data-kind="{{ title.kind }}" data-id="{{ title.id }}" ng-bind="title.text" ng-click="title.Query($event)" data-container="#member-containter" data-toggle="popover" tabindex="0" role="button" data-placement="bottom" data-trigger="focus click" popover-html-unsafe><!-- data-trigger="focus" -->
                 </span>
                 <div id="member" style="display: none;">
                     <div class="row">

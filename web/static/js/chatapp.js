@@ -106,6 +106,29 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             });
         },
 
+        Find: function ($event) {
+            $("div.modal#make_friends_modal").modal("show");
+            $http({
+                method: "POST",
+                url: "/findfriend",
+                data: {
+                    keyword: "user",
+                },
+            }).then(
+                function (res) {
+                    $scope.friend.found = res.data['friend'];
+                },
+                function (res) {
+                    console.log(res);
+                }
+            );
+        },
+
+        SetTarget: function ($event) {
+            var userid = $($event.currentTarget).attr("data-id");
+            $scope.friend.targetid = userid;
+        },
+
         MakeF: function () {
             if (!$scope.friend.targetid || $scope.friend.targetid.length <= 0) {
                 console.log("Target ID Error");
@@ -120,8 +143,11 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             }).then(
                 function (res) {
                     if (res.data['status'] === 'success') {
-                        $('#make_friends_modal').modal("hide");
+                        $scope.friend.addmessage = res.data['status'];
                         $scope.friend.Query();
+                        $timeout(function () {
+                            $('#make_friends_modal').modal("hide");
+                        }, 1000);
                     }
                     else {
                         $scope.friend.addresult = res.data['message'];
@@ -238,6 +264,29 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             });
         },
 
+        Find: function ($event) {
+            $("div.modal#join_group_modal").modal("show");
+            $http({
+                method: "POST",
+                url: "/findgroup",
+                data: {
+                    keyword: "g",
+                },
+            }).then(
+                function (res) {
+                    $scope.group.found = res.data['group'];
+                },
+                function (res) {
+                    console.log(res);
+                }
+            );
+        },
+
+        SetTarget: function ($event) {
+            var groupid = $($event.currentTarget).attr("data-id");
+            $scope.groupid.targetid = groupid;
+        },
+
         Create: function () {
             if (!$scope.group.newname || $scope.group.newname.length <= 0) {
                 return;
@@ -255,7 +304,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                     $scope.group.Query();
                     $timeout(function () {
                         $('#create_group_modal').modal("hide");
-                    }, 2000);
+                    }, 1000);
                 },
                 function (res) {
                     console.log("Create a new group ERROR");
@@ -635,6 +684,15 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             // store state
             $scope.chat.target.kind = kind;
             $scope.chat.target.id = id;
+
+            $timeout(function () {
+                $("[data-toggle='popover']").popover({
+                    html: true,
+                    content: function () {
+                        return $("div#member").html();
+                    },
+                });
+            });
         },
     };
 
@@ -655,9 +713,9 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
 
             $("[data-toggle='popover']").popover({
                 html: true,
-                content: function () {
-                    return $("div#member").html();
-                },
+                // trigger: 'manual',
+                content: function () { return $("div#member").html(); },
+                delay: { "show": 1000, "hide": 100 },
             });
         },
 
