@@ -74,7 +74,7 @@
                                         <div ng-if="friend.addmessage">
                                             <span ng-bind="friend.addmessage" class="form-control alert alert-info text-center"></span>
                                         </div>
-                                        <div ng-if="friend.addresult">
+                                        <div ng-if="friend.adderror">
                                             <span ng-bind="friend.addresult" class="form-control alert alert-danger text-center"></span>
                                         </div>
                                         <div class="form-group btn-group btn-group-justified" role="group">
@@ -323,7 +323,7 @@
             <div style="height: 640px;">
                 <span class="form-control btn btn-info" ng-if="chat.target.kind != 'group' && chat.target.kind != 'room'" data-kind="{{ title.kind }}" data-id="{{ title.id }}" ng-bind="title.text">
                 </span>
-                <span class="form-control btn btn-info" ng-if="chat.target.kind == 'group' || chat.target.kind == 'room'" data-kind="{{ title.kind }}" data-id="{{ title.id }}" ng-bind="title.text" ng-click="title.Query($event)" data-container="#member-containter" data-toggle="popover" tabindex="0" role="button" data-placement="bottom" data-trigger="focus click" popover-html-unsafe><!-- data-trigger="focus" -->
+                <span class="form-control btn btn-info" ng-if="chat.target.kind == 'group' || chat.target.kind == 'room'" data-kind="{{ title.kind }}" data-id="{{ title.id }}" ng-bind="title.text" ng-click="title.Query($event)" data-container="#member-containter" data-toggle="popover" tabindex="0" role="button" data-placement="bottom" data-trigger="focus" popover-html-unsafe><!-- data-trigger="focus" -->
                 </span>
                 <div id="member" style="display: none;">
                     <div class="row">

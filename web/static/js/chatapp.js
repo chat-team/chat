@@ -107,6 +107,8 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
         },
 
         Find: function ($event) {
+            $scope.friend.addmessage = undefined;
+            $scope.friend.adderror = undefined;
             $("div.modal#make_friends_modal").modal("show");
             $http({
                 method: "POST",
@@ -150,7 +152,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                         }, 500);
                     }
                     else {
-                        $scope.friend.addresult = res.data['message'];
+                        $scope.friend.adderror = res.data['message'];
                     }
                 },
                 function (res) {
@@ -265,6 +267,8 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
         },
 
         Find: function ($event) {
+            $scope.group.joinmessage = undefined;
+            $scope.group.joinerror = undefined;
             $("div.modal#join_group_modal").modal("show");
             $http({
                 method: "POST",
@@ -284,7 +288,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
 
         SetTarget: function ($event) {
             var groupid = $($event.currentTarget).attr("data-id");
-            $scope.groupid.targetid = groupid;
+            $scope.group.findid = groupid;
         },
 
         Create: function () {
@@ -324,11 +328,16 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                 },
             }).then(
                 function (res) {
-                    $scope.group.joinmessage = res.data['status'];
-                    $scope.group.Query();
-                    $timeout(function () {
-                        $('#join_group_modal').modal("hide");
-                    }, 2000);
+                    if (res.data['status'] == 'success') {
+                        $scope.group.joinmessage = res.data['status'];
+                        $scope.group.Query();
+                        $timeout(function () {
+                            $('#join_group_modal').modal("hide");
+                        }, 2000);
+                    }
+                    else {
+                        $scope.group.joinerror = res.data['message'];
+                    }
                 },
                 function (res) {
                     console.log("Join into group ERROR");
