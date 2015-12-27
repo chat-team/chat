@@ -279,6 +279,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             }).then(
                 function (res) {
                     $scope.group.found = res.data['group'];
+                    $scope.$digest()
                 },
                 function (res) {
                     console.log(res);
@@ -528,12 +529,19 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             }).then(
                 function (res) {
                     $scope.title.member = res.data['member'];
-                    $timeout(function () { dom.attr("data-content", $("div#member").html()); });
+                    $timeout(function () {
+                        dom.attr("data-content", $("div#member").html());
+                        $("span#popover-header").popover("toggle");
+                        $("body").click(function () {
+                            $("span#popover-header").popover("hide");
+                        });
+                    });
                 },
                 function (res) {
                     console.log("ERROR");
                 }
             );
+            $event.preventDefault();
         },
     };
 
@@ -630,14 +638,16 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
 
         LeaveRoom: function (roomid) {
             if (!$scope.chat.socket.room || $scope.chat.socket.room.readyState !== WebSocket.OPEN) {
-                return;
+                // DO NOTHING.
             }
-            $scope.chat.socket.room.send(JSON.stringify({
-                content: $scope.nickname + ' leave.',
-                target: roomid,
-                status: 'exit',
-            }));
-            $scope.chat.socket.room.close();
+            else {
+                $scope.chat.socket.room.send(JSON.stringify({
+                    content: $scope.nickname + ' leave.',
+                    target: roomid,
+                    status: 'exit',
+                }));
+                $scope.chat.socket.room.close();
+            }
         },
 
         Send: function () {
@@ -674,20 +684,33 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             if (kind === 'room') {
                 if (id !== $scope.chat.target.id) {
                     $scope.chat.LeaveRoom($scope.chat.target.id);
-                    $scope.chat.EnterRoom(id);
+                    $timeout(function () {
+                        $scope.chat.EnterRoom(id);
+                    }, 500); // call back.
+                    $scope.chat.unreads = [];
                 }
             }
             else {
                 $scope.chat.LeaveRoom(id);
                 $scope.chat.unreads = $scope.chat.log[kind][id] || [];
                 dom.children("span.badge").html('');
+                $scope.chat.unreads = [];
             }
             // toggle
             $("li.select").each(function (idx) {
                 $(this).removeClass("active");
             });
             dom.addClass("active");
-            $scope.title.text = kind + "  " + dom.attr("data-name");
+            if (kind === 'friend') {
+                $scope.title.text = "好友";
+            }
+            else if (kind === "group") {
+                $scope.title.text = "群组";
+            }
+            else {
+                $scope.title.text = "聊天室";
+            }
+            $scope.title.text += "  " + dom.attr("data-name");
             $scope.title.kind = kind;
             $scope.title.id = id;
 

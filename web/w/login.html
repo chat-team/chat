@@ -4,10 +4,10 @@
             <div class="panel-heading">
                 <div class="row">
                     <div class="col-xs-6">
-                        <a href="#login" class="active" id="login-form-link">Login</a>
+                        <a href="#login" class="active" id="login-form-link">登录</a>
                     </div>
                     <div class="col-xs-6">
-                        <a href="#register" id="register-form-link">Register</a>
+                        <a href="#register" id="register-form-link">注册</a>
                     </div>
                 </div>
                 <hr>
@@ -17,14 +17,14 @@
                     <div class="col-lg-12">
                         <form id="login-form" action="#" method="post" role="form" style="display: block;" onsubmit="return false;" ng-submit="login()">
                             <div class="form-group">
-                                <input type="text" name="userid" id="userid" ng-model="userid" tabindex="1" class="form-control" placeholder="User ID" value="" required auto-focus>
+                                <input type="text" name="userid" id="userid" ng-model="userid" tabindex="1" class="form-control" placeholder="用户ID" value="" required auto-focus>
                             </div>
                             <div class="form-group">
-                                <input type="password" name="password" id="password" ng-model="password" tabindex="2" class="form-control" placeholder="Password" required>
+                                <input type="password" name="password" id="password" ng-model="password" tabindex="2" class="form-control" placeholder="密码" required>
                             </div>
                             <div class="form-group text-center">
                                 <input type="checkbox" tabindex="3" class="" name="remember" id="remember">
-                                <label for="remember"> Remember Me</label>
+                                <label for="remember">记住密码</label>
                             </div>
                             <div class="form-group text-center">
                                 <span>{{ message }}</span>
@@ -32,7 +32,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-6 col-sm-offset-3">
-                                        <input type="submit" name="login-submit" id="login-submit" tabindex="4" class="form-control btn btn-login" value="Log In">
+                                        <input type="submit" name="login-submit" id="login-submit" tabindex="4" class="form-control btn btn-login" value="登陆">
                                     </div>
                                 </div>
                             </div>
@@ -40,7 +40,7 @@
                                 <div class="row">
                                     <div class="col-lg-12">
                                         <div class="text-center">
-                                            <a href="" tabindex="5" class="forgot-password">Forgot Password?</a>
+                                            <a href="" tabindex="5" class="forgot-password">忘记密码 ?</a>
                                         </div>
                                     </div>
                                 </div>

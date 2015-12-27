@@ -16,7 +16,7 @@ create table group_info (
 	groupid integer primary key not null auto_increment,
     groupname varchar(30) not null,
     admin varchar(10) not null,
-    description varchar(50)
+    description varchar(512)
 ) engine=innodb, charset=utf8;
 
 create table message (
@@ -30,14 +30,14 @@ create table message (
 create table note (
 	noteid integer primary key not null auto_increment,
     ctime timestamp not null default CURRENT_TIMESTAMP,
-    content varchar(100) not null,
+    content varchar(512) not null,
     userid integer not null
 ) engine=innodb, charset=utf8;
 
 create table chatroom (
 	roomid integer primary key not null auto_increment,
 	roomname varchar(30) not null,
-    description varchar(50)
+	description varchar(512)
 ) engine=innodb, charset=utf8;
 
 create table friend (
@@ -111,7 +111,7 @@ FOR EACH ROW
 insert into board_belong (roomid) values (new.roomid);
 
 DELIMITER $$
-CREATE PROCEDURE add_note(IN content_note varchar(100), IN userid_note int)
+CREATE PROCEDURE add_note(IN content_note varchar(512), IN userid_note int)
 BEGIN
 INSERT INTO note(content, userid) VALUES (content_note, userid_note);
 SELECT noteid FROM note ORDER BY noteid DESC LIMIT 1;

@@ -13,6 +13,7 @@ public class Message {
 
     private int messageid;
     private String sender;
+    private String nickname;
     private String content;
     private String target;
     private String ctime;
@@ -38,11 +39,40 @@ public class Message {
 
     public void setSender(String sender) {
         this.sender = sender;
+        DatabaseConnection dbConn = new DatabaseConnection();
+        Connection conn = dbConn.getConnection();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            String sql = "select nickname from user_info where userid = ?";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, sender);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                nickname = rs.getString("nickname");
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public String getSender() {
         return sender;
     }
+
+    public String getNickname() { return this.nickname; }
 
     public void setTarget(String target) {
         this.target = target;

@@ -15,6 +15,7 @@ public class MessageEncoder implements Encoder.Text<Message> {
     public String encode(Message message) throws EncodeException {
         JsonObjectBuilder builder = Json.createObjectBuilder()
                 .add("sender", message.getSender())
+                .add("nickname", message.getNickname())
                 .add("content", message.getContent())
                 .add("ctime", message.getCtime());
         if (message.getGroup() != null) {

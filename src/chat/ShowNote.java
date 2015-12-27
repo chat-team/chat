@@ -46,7 +46,7 @@ public class ShowNote extends HttpServlet {
         Connection conn = dbConn.getConnection();
         String sql = "SELECT ctime, content, userid FROM note_belong, note WHERE note_belong.noteid = note.noteid AND boardid = ?";
         PreparedStatement ps = null;
-        ResultSet rs = null;
+        ResultSet rs = null, rt;
         try {
             ps = conn.prepareStatement(sql);
             ps.setString(1, boardid);
@@ -57,6 +57,13 @@ public class ShowNote extends HttpServlet {
                 m.put("userid", rs.getString("userid"));
                 m.put("ctime", rs.getString("ctime"));
                 m.put("content", rs.getString("content"));
+                sql = "select nickname from user_info where userid = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, rs.getString("userid"));
+                rt = ps.executeQuery();
+                if (rt.next()) {
+                    m.put("nickname", rt.getString("nickname"));
+                }
                 array.add(m);
             }
             writer.add("status", "success");

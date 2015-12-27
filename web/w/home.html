@@ -1,6 +1,6 @@
 <div class="row text-center main-container">
     <div class="panel panel-default panel-home col-md-12 col-sm-12 fill">
-        <div class="col-md-3 col-sm-3 col-xs-12 panel panel-home" ng-init="init.Initial()" style="height: 640px;">
+        <div class="col-md-3 col-sm-3 col-xs-12 panel panel-home" ng-init="init.Initial()" style="height: 646px;">
             <div class="row panel-heading">
                 <ul id="snav col-md-3 col-sm-3 col-xs-12" class="nav nav-tabs nav-justified">
                     <li class="active nav-item" data-page="friends" ng-click="init.Toggle($event)" >
@@ -285,7 +285,7 @@
                                         <div ng-repeat="x in room.note">
                                             <div class="row input-group text-left">
                                                 <span class="input-group-addon" data-toggle="tooltip" tooltip-placement="bottom" tooltip="{{ x.ctime }}">
-                                                    <button class="form-control btn btn-default btn-sm"><span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;{{ x.userid }}</button>
+                                                    <button class="form-control btn btn-default btn-sm"><span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;{{ x.nickname }}</button>
                                                 </span>
                                                 <div class="messagebox message-left pull-left">
                                                     <div class="arrow">
@@ -319,12 +319,13 @@
             </div>
         </div>
         
+        <div class="col-md-9 col-sm-9 col-xs-12 col-lg-9 text-center" style="padding-left: 0px !important; padding-right: 0px !important; ">
+            <span id="popover-header" class="form-control btn btn-primary" data-kind="{{ title.kind }}" data-id="{{ title.id }}" ng-bind="title.text" ng-click="title.Query($event)" data-container="#member-containter" data-toggle="popover" tabindex="0" role="button" data-placement="bottom" data-trigger="manual" popover-html-unsafe><!-- data-trigger="focus" -->
+            </span>
+        </div>
+
         <div class="col-md-9 col-sm-9 col-xs-12 col-lg-9 text-center panel panel-home">
-            <div style="height: 640px;">
-                <span class="form-control btn btn-info" ng-if="chat.target.kind != 'group' && chat.target.kind != 'room'" data-kind="{{ title.kind }}" data-id="{{ title.id }}" ng-bind="title.text">
-                </span>
-                <span class="form-control btn btn-info" ng-if="chat.target.kind == 'group' || chat.target.kind == 'room'" data-kind="{{ title.kind }}" data-id="{{ title.id }}" ng-bind="title.text" ng-click="title.Query($event)" data-container="#member-containter" data-toggle="popover" tabindex="0" role="button" data-placement="bottom" data-trigger="focus" popover-html-unsafe><!-- data-trigger="focus" -->
-                </span>
+            <div style="height: 610px;">
                 <div id="member" style="display: none;">
                     <div class="row">
                         <div class="col-sm-2 col-md-2 col-xs-4 col-lg-2 text-center" ng-repeat="x in title.member" data-toggle="tooltip" tooltip-placement="left" tooltip="ID: {{ x.userid }}">
@@ -342,7 +343,7 @@
                             <br />
                             <div class="row input-group text-left" ng-if="!x.self">
                                 <span class="input-group-addon" data-toggle="tooltip" tooltip-placement="bottom" tooltip="{{ x.ctime }}">
-                                    <button class="form-control btn btn-default btn-sm"><span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;{{ x.sender }}</button>
+                                    <button class="form-control btn btn-default btn-sm"><span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;{{ x.nickname }}</button>
                                 </span>
                                 <div class="messagebox message-left pull-left">
                                     <div class="arrow">
@@ -375,9 +376,9 @@
                 <div>
                     <form action="#" method="post" onsubmit="return false;" ng-submit="chat.Send()" style="padding-bottom: 0px;">
                         <div class="input-group">
-                            <input type="text" maxlength="512" autocomplete="off" class="form-control" name="nextmsg" ng-model="chat.message" value="" placeholder="Message">
+                            <input type="text" maxlength="512" autocomplete="off" class="form-control" name="nextmsg" ng-model="chat.message" value="" placeholder="新消息">
                             <span class="input-group-btn">
-                                <button class="btn btn-default" type="submit">Send</button>
+                                <button class="btn btn-default" type="submit">发送</button>
                             </span>
                         </div>
                     </form>
