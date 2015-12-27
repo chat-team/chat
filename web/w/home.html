@@ -26,7 +26,7 @@
                         <li class="list-group-item text-center">
                             <input type="text" ng-model="friend.find" placeholder="查找好友" class="form-control" ng-change="friend.Search()">
                         </li>
-                        <li class="list-group-item search-result" ng-repeat="x in friend.search" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.userid }}" data-id="{{ x.userid }}">
+                        <li class="list-group-item search-result" ng-repeat="x in friend.search" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.userid }}" data-id="{{ x.userid }}" ng-click="friend.SearchClick($event)">
                             <span>{{ x.nickname }}</span>
                         </li>
                         <li class="list-group-item search-result" data-toggle="modal" data-target="#make_friends_modal" ng-if="friend.find">
@@ -78,10 +78,10 @@
                         <li class="list-group-item text-center">
                             <input type="text" ng-model="group.find" placeholder="查找群组" class="form-control" ng-change="group.Search()">
                         </li>
-                        <li class="list-group-item search-result" ng-repeat="x in group.search" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-id="{{ x.group }}">
+                        <li class="list-group-item search-result" ng-repeat="x in group.search" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.groupid }}" data-id="{{ x.groupid }}" ng-click="group.SearchClick($event)">
                             <span>{{ x.groupname }}</span>
                         </li>
-                        <li class="list-group-item search-result" data-toggle="modal" data-target="#make_friends_modal" ng-if="group.find">
+                        <li class="list-group-item search-result" data-toggle="modal" data-target="#join_group_modal" ng-if="group.find">
                             <span class="glyphicon glyphicons-user_add">&nbsp;&nbsp;查找更多</span>
                         </li>
 
@@ -160,13 +160,44 @@
                             </div>
                         </div>
                     </div>
+                    <div class="modal fade" id="join_group_modal" tabindex="-1", role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times</button>
+                                    <h4 class="modal-title">加入群组</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form class="form text-left" role="form" action="#" method="post" accept-charset="utf-8" onsubmit="return false;" ng-submit="group.Join()">
+                                        <div class="form-group">
+                                            <input class="form-control" name="name" type="text" value="" placeholder="群组 ID" ng-model="group.findid">
+                                        </div>
+                                        <div ng-if="group.joinerror">
+                                            <span ng-bind="group.joinerror" class="form-control alert alert-danger text-center"></span>
+                                        </div>
+                                        <div ng-if="group.joinmessage">
+                                            <span ng-bind="group.joinmessage" class="form-control alert alert-success text-center"></span>
+                                        </div>
+                                        <div class="form-group btn-group btn-group-justified" role="group">
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="from-control btn btn-default" data-dismiss="modal">取消</button>
+                                            </div>
+                                            <div class="btn-group" role="group">
+                                                <button type="submit" class="from-control btn btn-primary">发送请求</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div id="rooms" style="display: none;">
                     <ul class="list-group text-center all-item-group">
                         <li class="list-group-item text-center">
                             <input type="text" ng-model="room.find" placeholder="查找聊天室" class="form-control" ng-change="room.Search()">
                         </li>
-                        <li class="list-group-item search-result" ng-repeat="x in room.search" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.roomid }}" data-id="{{ x.roomname }}">
+                        <li class="list-group-item search-result" ng-repeat="x in room.search" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.roomid }}" data-id="{{ x.roomid }}" ng-click="room.SearchClick($event)">
                             <span>{{ x.roomname }}</span>
                         </li>
                         <li class="list-group-item select context-room" data-toggle="context" data-target="#context-room-menu" ng-repeat="x in room.all" data-toggle="tooltip" tooltip-placement="bottom" tooltip="ID: {{ x.roomid }}" data-id="{{ x.roomid }}" data-kind="room" data-name="{{ x.roomname }}" ng-click="chat.SetContext($event)">
@@ -185,10 +216,11 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times</button>
-                                    <h4 class="modal-title">查看留言</h4>
+                                    <h4 class="modal-title">留言板&nbsp;<b>#{{ room.boardid }}</b></h4>
                                 </div>
                                 <div class="modal-body">
                                     <form role="form">
+                                        <label>所有留言</label>
                                         <div ng-repeat="x in room.note">
                                             <div class="row input-group text-left">
                                                 <span class="input-group-addon" data-toggle="tooltip" tooltip-placement="bottom" tooltip="{{ x.ctime }}">
@@ -205,6 +237,17 @@
                                                 </div>
                                                 <br />
                                             </div>
+                                        </div>
+                                    </form>
+                                    <hr>
+                                    <form action="#" method="post" onsubmit="return false;" ng-submit="room.MakeNote()" style="padding-bottom: 0px;">
+                                        <label>创建新留言</label>
+                                        <div class="input-group">
+                                            <!-- <textarea class="form-control" name="description" rows="3" max-length="512" ng-model="room.newnote" placeholder="新留言" autocomplete="off"></textarea> -->
+                                            <input type="text" maxlength="512" autocomplete="off" class="form-control" name="nextmsg" ng-model="room.newnote" value="" placeholder="新留言">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default form-control" type="submit">发布</button>
+                                            </span>
                                         </div>
                                     </form>
                                 </div>

@@ -65,7 +65,7 @@ public class AddNote extends HttpServlet {
                 writer.add("status", "failed").write();
                 return;
             }
-            sql = "INSERT INTO note_belong(board_id, userid) VALUES (?, ?)";
+            sql = "INSERT INTO note_belong(boardid, noteid) VALUES (?, ?)";
             ps = conn.prepareStatement(sql);
             ps.setString(1, targetid);
             ps.setInt(2, noteid);

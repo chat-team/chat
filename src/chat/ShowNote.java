@@ -44,7 +44,7 @@ public class ShowNote extends HttpServlet {
 
         DatabaseConnection dbConn = new DatabaseConnection();
         Connection conn = dbConn.getConnection();
-        String sql = "SELECT ctime, content, userid FROM note_belong, note WHERE note_belong.noteid == note.noteid AND boardid = ?";
+        String sql = "SELECT ctime, content, userid FROM note_belong, note WHERE note_belong.noteid = note.noteid AND boardid = ?";
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {

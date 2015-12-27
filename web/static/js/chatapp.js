@@ -96,6 +96,16 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             }
         },
 
+        SearchClick: function ($event) {
+            var dom = $($event.currentTarget);
+            $scope.friend.find = "";
+            $scope.friend.search = [];
+            var userid = dom.attr("data-id");
+            $timeout(function () { //  DO NOT break out of the current $apply() cycle. 
+                $("div#friends > ul > li[data-id='" + userid + "']").trigger("click");
+            });
+        },
+
         MakeF: function () {
             if (!$scope.friend.targetid || $scope.friend.targetid.length <= 0) {
                 console.log("Target ID Error");
@@ -213,6 +223,21 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             }
         },
 
+        SearchClick: function ($event) {
+            var dom = $($event.currentTarget);
+            $scope.group.find = "";
+            $scope.group.search = [];
+            var groupid = dom.attr("data-id");
+            $timeout(function () { //  DO NOT break out of the current $apply() cycle.
+                if ($("div#admined-groups > div > li[data-id='" + groupid + "']")) {
+                    $("div#admined-groups > div > li[data-id='" + groupid + "']").trigger("click");
+                }
+                else {
+                    $("div#joined-groups > div > li[data-id='" + groupid + "']").trigger("click");
+                }
+            });
+        },
+
         Create: function () {
             if (!$scope.group.newname || $scope.group.newname.length <= 0) {
                 return;
@@ -239,18 +264,22 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
         },
 
         Join: function () {
-            if (!$scope.group.search || $scope.group.search.length <= 0) {
+            if (!$scope.group.findid || $scope.group.findid.length <= 0) {
                 return;
             }
             $http({
                 method: "POST",
                 url: "/joingroup",
                 data: {
-                    "targetid": $scope.group.search,
+                    "targetid": $scope.group.findid,
                 },
             }).then(
                 function (res) {
+                    $scope.group.joinmessage = res.data['status'];
                     $scope.group.Query();
+                    $timeout(function () {
+                        $('#join_group_modal').modal("hide");
+                    }, 2000);
                 },
                 function (res) {
                     console.log("Join into group ERROR");
@@ -277,6 +306,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
     };
 
     $scope.room = {
+        boardid: '0',
         note: [],
         
         BindContext: function () {
@@ -301,11 +331,12 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
         },
 
         ViewNotes: function (roomid) {
+            $scope.room.boardid = roomid;
             $http({
                 method: "POST",
                 url: "/shownote",
                 data: {
-                    boardid: roomid,
+                    boardid: $scope.room.boardid,
                 },
             }).then(
                 function (res) {
@@ -313,6 +344,38 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                     $timeout(function () {
                         $("div.modal#view_notes_modal").modal('show');
                     });
+                },
+                function (res) {
+                    console.log(res);
+                }
+            );
+        },
+
+        MakeNote: function () {
+            $http({
+                method: "POST",
+                url: "/addnote",
+                data: {
+                    targetid: $scope.room.boardid,
+                    content: $scope.room.newnote || "",
+                }
+            }).then(
+                // refresh.
+                function (res) {
+                    $http({
+                        method: "POST",
+                        url: "/shownote",
+                        data: {
+                            boardid: $scope.room.boardid,
+                        },
+                    }).then(
+                        function (res) {
+                            $scope.room.note = res.data['note'];
+                        },
+                        function (res) {
+                            console.log(res);
+                        }
+                    );
                 },
                 function (res) {
                     console.log(res);
@@ -373,6 +436,16 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                 }
                 $scope.room.search = res;
             }
+        },
+
+        SearchClick: function ($event) {
+            var dom = $($event.currentTarget);
+            $scope.room.find = "";
+            $scope.room.search = [];
+            var roomid = dom.attr("data-id");
+            $timeout(function () { //  DO NOT break out of the current $apply() cycle. 
+                $("div#rooms > ul > li[data-id='" + roomid + "']").trigger("click");
+            });
         },
     };
 
