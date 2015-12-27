@@ -1,6 +1,7 @@
 <div class="row text-center main-container">
     <div class="panel panel-default panel-home col-md-12 col-sm-12 fill">
         <div class="col-md-3 col-sm-3 col-xs-12 panel panel-home" ng-init="init.Initial()" style="height: 646px;">
+            
             <div class="row panel-heading">
                 <ul id="snav col-md-3 col-sm-3 col-xs-12" class="nav nav-tabs nav-justified">
                     <li class="active nav-item" data-page="friends" ng-click="init.Toggle($event)" >
@@ -20,6 +21,7 @@
                     </li>
                 </ul>
             </div>
+
             <div class="row" id="spage">
                 <div id="friends" style="display: block;">
                     <ul class="list-group text-center all-item-group">
@@ -40,6 +42,7 @@
                     <div id="context-friend-menu" style="position: absolute; z-index: 9999; top: 389px; left: 558px;" class="">
                         <ul class="dropdown-menu" role="menu">
                             <li data-action="chat"><a tabindex="-1">发起聊天</a></li>
+                            <li data-action="view_record"><a tabindex="-1">聊天记录</a></li>
                             <li class="divider"></li>
                             <li data-action="delete"><a tabindex="-1">删除好友</a></li>
                         </ul>
@@ -91,35 +94,52 @@
                         </div>
                     </div>
 
-                    <!-- <div class="modal fade" id="make_friends_modal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal fade" id="view_friend_record" tabindex="-1", role="dialog" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times</button>
-                                    <h4 class="modal-title">添加好友</h4>
+                                    <h4 class="modal-title">好友聊天记录</b></h4>
                                 </div>
                                 <div class="modal-body">
-                                    <form class="form" role="form" action="#" method="post" accept-charset="utf-8" onsubmit="return false;" ng-submit="friend.MakeF()">
-                                        <div class="form-group">
-                                            <input class="form-control" type="text" value="" placeholder="好友ID" ng-model="friend.targetid">
-                                        </div>
-                                        <div ng-if="friend.addresult">
-                                            <span ng-bind="friend.addresult" class="form-control alert alert-danger text-center"></span>
-                                        </div>
-                                        <div class="form-group btn-group btn-group-justified" role="group">
-                                            <div class="btn-group" role="group">
-                                                <button type="button" class="from-control btn btn-default" data-dismiss="modal">取消</button>
+                                    <form role="form">
+                                        <div ng-repeat="x in friend.record">
+                                            <div class="row input-group text-left" ng-if="x.userid != userid">
+                                                <span class="input-group-addon" data-toggle="tooltip" tooltip-placement="bottom" tooltip="{{ x.ctime }}">
+                                                    <button class="form-control btn btn-default btn-sm"><span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;{{ x.nickname }}</button>
+                                                </span>
+                                                <div class="messagebox message-left pull-left">
+                                                    <div class="arrow">
+                                                        <div class="outer"></div>
+                                                        <div class="inner"></div>
+                                                    </div>
+                                                    <div class="message-body">
+                                                        <p>{{ x.content }}</p>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="btn-group" role="group">
-                                                <button type="submit" class="from-control btn btn-primary">发送请求</button>
+                                            <div class="row input-group text-right" ng-if="x.userid == userid">
+                                                <div class="messagebox message-right pull-right">
+                                                    <div class="message-body">
+                                                        <p>{{ x.content }}</p>
+                                                    </div>
+                                                    <div class="arrow">
+                                                        <div class="outer"></div>
+                                                        <div class="inner"></div>
+                                                    </div>
+                                                </div>
+                                                <span class="input-group-addon" data-toggle="tooltip" tooltip-placement="bottom" tooltip="{{ x.ctime }}">
+                                                    <button class="form-control btn btn-default btn-sm">{{ x.nickname }}&nbsp;&nbsp;<span class="glyphicon glyphicon-user"></span></button>
+                                                </span>
                                             </div>
                                         </div>
                                     </form>
                                 </div>
                             </div>
                         </div>
-                    </div> -->
+                    </div>
                 </div>
+
                 <div id="groups" style="display: none;">
                     <ul class="list-group text-center all-item-group">
                         <li class="list-group-item text-center">
@@ -164,13 +184,16 @@
                             </div>
                         </div>
                     </ul>
+                    
                     <div id="context-group-menu" style="position: absolute; z-index: 9999; top: 389px; left: 558px;" class="">
                         <ul class="dropdown-menu" role="menu">
                             <li data-action="chat"><a tabindex="-1">发起聊天</a></li>
+                            <li data-action="view_record"><a tabindex="-1">聊天记录</a></li>
                             <li class="divider"></li>
                             <li data-action="delete"><a tabindex="-1">删除群组</a></li>
                         </ul>
                     </div>
+                    
                     <div class="modal fade" id="create_group_modal" tabindex="-1" role="dialog" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -207,6 +230,7 @@
                             </div>
                         </div>
                     </div>
+                    
                     <div class="modal fade" id="join_group_modal" tabindex="-1" role="dialog" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -252,7 +276,53 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="modal fade" id="view_group_record" tabindex="-1", role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times</button>
+                                    <h4 class="modal-title">群组聊天记录</b></h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form role="form">
+                                        <div ng-repeat="x in group.record">
+                                            <div class="row input-group text-left" ng-if="x.userid != userid">
+                                                <span class="input-group-addon" data-toggle="tooltip" tooltip-placement="bottom" tooltip="{{ x.ctime }}">
+                                                    <button class="form-control btn btn-default btn-sm"><span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;{{ x.nickname }}</button>
+                                                </span>
+                                                <div class="messagebox message-left pull-left">
+                                                    <div class="arrow">
+                                                        <div class="outer"></div>
+                                                        <div class="inner"></div>
+                                                    </div>
+                                                    <div class="message-body">
+                                                        <p>{{ x.content }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row input-group text-right" ng-if="x.userid == userid">
+                                                <div class="messagebox message-right pull-right">
+                                                    <div class="message-body">
+                                                        <p>{{ x.content }}</p>
+                                                    </div>
+                                                    <div class="arrow">
+                                                        <div class="outer"></div>
+                                                        <div class="inner"></div>
+                                                    </div>
+                                                </div>
+                                                <span class="input-group-addon" data-toggle="tooltip" tooltip-placement="bottom" tooltip="{{ x.ctime }}">
+                                                    <button class="form-control btn btn-default btn-sm">{{ x.nickname }}&nbsp;&nbsp;<span class="glyphicon glyphicon-user"></span></button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
                 <div id="rooms" style="display: none;">
                     <ul class="list-group text-center all-item-group">
                         <li class="list-group-item text-center">
@@ -376,7 +446,7 @@
                 <div>
                     <form action="#" method="post" onsubmit="return false;" ng-submit="chat.Send()" style="padding-bottom: 0px;">
                         <div class="input-group">
-                            <input type="text" maxlength="512" autocomplete="off" class="form-control" name="nextmsg" ng-model="chat.message" value="" placeholder="新消息">
+                            <input type="text" maxlength="512" autocomplete="off" class="form-control" name="nextmsg" ng-model="chat.message" value="" placeholder="新消息" ng-disabled="!(chat.target.kind && chat.target.id)">
                             <span class="input-group-btn">
                                 <button class="btn btn-default" type="submit">发送</button>
                             </span>

@@ -55,8 +55,11 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                     if (action === "chat") {
                         $(context.context).click();
                     }
-                    else {
+                    else if (action === "delete"){
                         $scope.friend.Delete(userid);
+                    }
+                    else {
+                        $scope.friend.ViewRecord(userid);
                     }
                 },
             });
@@ -177,6 +180,28 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                 }
             );
         },
+
+        ViewRecord: function (userid) {
+            $http({
+                method: "POST",
+                url: "/askchatrecord",
+                data: {
+                    targetid: userid,
+                },
+            }).then(
+                function (res) {
+                    if (res.data['status'] === 'success') {
+                        $scope.friend.record = res.data['chatrecord'];
+                        $timeout(function () {
+                            $("div.modal#view_friend_record").modal("show");
+                        });
+                    }
+                },
+                function (res) {
+                    console.log(res);
+                }
+            );
+        },
     };
 
     $scope.group = {
@@ -193,8 +218,11 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                     if (action === "chat") {
                         $(context.context).click();
                     }
-                    else {
+                    else if(action === "delete") {
                         $scope.group.Delete(groupid);
+                    }
+                    else {
+                        $scope.group.ViewRecord(groupid);
                     }
                 }
             });
@@ -356,6 +384,28 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             }).then(
                 function (res) {
                     $scope.group.Query();
+                },
+                function (res) {
+                    console.log(res);
+                }
+            );
+        },
+
+        ViewRecord: function (groupid) {
+            $http({
+                method: "POST",
+                url: "/askgrouprecord",
+                data: {
+                    groupid: groupid,
+                },
+            }).then(
+                function (res) {
+                    if (res.data['status'] === 'success') {
+                        $scope.group.record = res.data['grouprecord'];
+                        $timeout(function () {
+                            $("div.modal#view_group_record").modal("show");
+                        });
+                    }
                 },
                 function (res) {
                     console.log(res);
@@ -694,7 +744,6 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                 $scope.chat.LeaveRoom(id);
                 $scope.chat.unreads = $scope.chat.log[kind][id] || [];
                 dom.children("span.badge").html('');
-                $scope.chat.unreads = [];
             }
             // toggle
             $("li.select").each(function (idx) {

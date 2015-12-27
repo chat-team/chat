@@ -44,9 +44,9 @@ public class AskGroupRecord extends HttpServlet {
 
         DatabaseConnection dbConn = new DatabaseConnection();
         Connection conn = dbConn.getConnection();
-        String sql = "SELECT ctime, content, userid FROM group_record, message WHERE group_record.messageid == message.messageid AND groupid = ?";
+        String sql = "SELECT ctime, content, userid FROM group_record, message WHERE group_record.messageid = message.messageid AND groupid = ?";
         PreparedStatement ps = null;
-        ResultSet rs = null;
+        ResultSet rs = null, rt = null;
         try {
             ps = conn.prepareStatement(sql);
             ps.setString(1, groupid);
@@ -57,6 +57,15 @@ public class AskGroupRecord extends HttpServlet {
                 m.put("userid", rs.getString("userid"));
                 m.put("ctime", rs.getString("ctime"));
                 m.put("content", rs.getString("content"));
+
+                sql = "select nickname from user_info where userid = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, rs.getString("userid"));
+                rt = ps.executeQuery();
+                if (rt.next()) {
+                    m.put("nickname", rt.getString("nickname"));
+                }
+
                 array.add(m);
             }
             writer.add("status", "success");

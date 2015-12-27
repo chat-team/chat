@@ -44,11 +44,12 @@ public class AskChatRecord extends HttpServlet {
 
         DatabaseConnection dbConn = new DatabaseConnection();
         Connection conn = dbConn.getConnection();
-        String sql = "((SELECT ctime, content, userid FROM chat_record, message WHERE chat_record.messageid == message.messageid AND useraid = ? AND userbid = ?)" +
-                " UNION " +
-                "(SELECT ctime, content, userid FROM chat_record, message WHERE chat_record.messageid == message.messageid AND useraid = ? AND userbid = ?)) ORDER BY ctime";
+        String sql = "SELECT ctime, content, userid FROM chat_record, message \n" +
+                "WHERE\n" +
+                "chat_record.messageid = message.messageid AND ((useraid = ? AND userbid = ?) or (useraid = ? AND userbid = ?))\n" +
+                "ORDER BY ctime";
         PreparedStatement ps = null;
-        ResultSet rs = null;
+        ResultSet rs = null, rt = null;
         try {
             ps = conn.prepareStatement(sql);
             ps.setString(1, username);
@@ -62,6 +63,15 @@ public class AskChatRecord extends HttpServlet {
                 m.put("userid", rs.getString("userid"));
                 m.put("ctime", rs.getString("ctime"));
                 m.put("content", rs.getString("content"));
+
+                sql = "select nickname from user_info where userid = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, rs.getString("userid"));
+                rt = ps.executeQuery();
+                if (rt.next()) {
+                    m.put("nickname", rt.getString("nickname"));
+                }
+
                 array.add(m);
             }
             writer.add("status", "success");
