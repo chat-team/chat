@@ -43,7 +43,9 @@ public class Login extends HttpServlet {
             if (rs.next()) {
                 if (CipherUtil.checkPassword(password, rs.getString("passwd"))) {
                     session.setAttribute("userid", username);
+                    writer.add("userid", rs.getString("userid"));
                     writer.add("nickname", rs.getString("nickname"));
+                    writer.add("email", rs.getString("email"));
                     writer.add("status", "success").write();
                 }
                 else {

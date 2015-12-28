@@ -41,6 +41,7 @@ app.config(function ($httpProvider) {
 app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
     $scope.userid = $.cookie('userid') || '';
     $scope.nickname = $.cookie('nickname') || '';
+    $scope.email = $.cookie('email') || '';
 
     $scope.friend = {
         BindContext: function () {
@@ -148,6 +149,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             }).then(
                 function (res) {
                     if (res.data['status'] === 'success') {
+                        $scope.friend.adderror = undefined;
                         $scope.friend.addmessage = res.data['status'];
                         $scope.friend.Query();
                         $timeout(function () {
@@ -307,7 +309,6 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             }).then(
                 function (res) {
                     $scope.group.found = res.data['group'];
-                    $scope.$digest()
                 },
                 function (res) {
                     console.log(res);
@@ -333,11 +334,18 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                 },
             }).then(
                 function (res) {
-                    $scope.group.createmessage = res.data['status'];
-                    $scope.group.Query();
-                    $timeout(function () {
-                        $('#create_group_modal').modal("hide");
-                    }, 500);
+                    $scope.group.createerror = undefined;
+                    $scope.group.createmessage = undefined;
+                    if (res.data['status'] == 'success') {
+                        $scope.group.createmessage = res.data['status'];
+                        $scope.group.Query();
+                        $timeout(function () {
+                            $('#create_group_modal').modal("hide");
+                        }, 500);
+                    }
+                    else {
+                        $scope.group.createerror = res.data['status'];
+                    }
                 },
                 function (res) {
                     console.log("Create a new group ERROR");
@@ -346,6 +354,8 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
         },
 
         Join: function () {
+            $scope.group.joinerror = undefined;
+            $scope.group.joinmessage = undefined;
             if (!$scope.group.findid || $scope.group.findid.length <= 0) {
                 return;
             }
@@ -358,6 +368,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             }).then(
                 function (res) {
                     if (res.data['status'] == 'success') {
+                        $scope.group.joinerror = undefined;
                         $scope.group.joinmessage = res.data['status'];
                         $scope.group.Query();
                         $timeout(function () {
@@ -365,6 +376,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                         }, 2000);
                     }
                     else {
+                        $scope.group.joinmessage = undefined;
                         $scope.group.joinerror = res.data['message'];
                     }
                 },
@@ -778,6 +790,128 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
         },
     };
 
+    $scope.profile = {
+
+        n_nickname: $scope.nickname,
+        n_email: $scope.email,
+        n_pass: "",
+        n_pass_again: "",
+        n_pass_old: "",
+
+        BindContext: function () {
+            $('.context-me').contextmenu({
+                target:'#context-me-menu', 
+                before: function(e, context) {
+                    // execute code before context menu if shown
+                },
+                onItem: function(context, e) {
+                    var action = $(e.currentTarget).attr("data-action");
+                    if (action === "update_profile") {
+                        $scope.profile.updatemessage = undefined;
+                        $scope.profile.updateerror = undefined;
+                        $("div.modal#update_profile_modal").modal("show");
+                    }
+                    else if (action === "update_pass"){
+                        $scope.profile.updatepassmessage = undefined;
+                        $scope.profile.updatepasserror = undefined;
+                        $("div.modal#update_pass_modal").modal("show");
+                    }
+                    else {
+                        $scope.profile.Logout();
+                    }
+                },
+            });
+        },
+
+        UpdateProfile: function () {
+            $http({
+                method: "POST",
+                url: "/modifyprofile",
+                data: {
+                    nickname: $scope.profile.n_nickname,
+                    email: $scope.profile.n_email,
+                },
+            }).then(
+                function (res) {
+                    if (res.data['status'] === "success") {
+                        $scope.profile.updateerror = undefined;
+                        $scope.profile.updatemessage = res.data['status'];
+                        
+                        // update storage.
+                        $.cookie("nickname", $scope.profile.n_nickname);
+                        $.cookie("email", $scope.profile.n_email);
+                        $scope.nickname = $.cookie('nickname') || '';
+                        $scope.email = $.cookie('email') || '';
+
+                        $timeout(function () {
+                            $("div.modal#update_profile_modal").modal("hide");
+                        }, 800);
+                    }
+                    else {
+                        $scope.profile.updatemessage = undefined;
+                        $scope.profile.updateerror = res.data['message'];
+                    }
+                },
+                function (res) {
+                    console.log(res);
+                }
+            );
+        },
+
+        UpdatePass: function () {
+            if ($scope.profile.n_pass !== $scope.profile.n_pass_again) {
+                $scope.profile.updatepasserror = "new passwords don't match.";
+                return;
+            }
+            $http({
+                method: "POST",
+                url: "/modifypass",
+                data: {
+                    passwd: $scope.profile.n_pass_old,
+                    newpasswd: $scope.profile.n_pass,
+                },
+            }).then(
+                function (res) {
+                    if (res.data['status'] === "success") {
+                        $scope.profile.updatepasserror = undefined;
+                        $scope.profile.updatepassmessage = res.data['status'];
+                        $timeout(function () {
+                            $("div.modal#update_pass_modal").modal("hide");
+                        }, 800);
+                    }
+                    else {
+                        $scope.profile.updatepassmessage = undefined;
+                        $scope.profile.updatepasserror = res.data['message'];
+                    }
+                },
+                function (res) {
+
+                }
+            );
+        },
+
+        Logout: function () {
+            $http({
+                method: "POST",
+                url: "/logout",
+                data: {},
+            }).then(
+                function (res) {
+                    $location.path("/login");
+                },
+                function (res) {
+                    console.log(res);
+                }
+            );
+        },
+
+        InfoWindow: function () {
+            $scope.profile.updatemessage = undefined;
+            $scope.profile.updateerror = undefined;
+            $('div.modal#update_profile_modal').modal('show');
+        },
+    },
+
     $scope.init = {
         // environment initialize.
         Initial: function () {
@@ -799,6 +933,8 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                 content: function () { return $("div#member").html(); },
                 delay: { "show": 500, "hide": 100 },
             });
+
+            $scope.profile.BindContext();
         },
 
         // toggle tab.
@@ -830,9 +966,10 @@ app.controller("LoginCtrl", function ($scope, $http, $location) {
         $http(req).then(
             function (res) {
                 if (res.data['status'] === 'success') {
-                    // store user ID in cookie.
-                    $.cookie("userid", $scope.userid);
+                    // store user information in cookie.
+                    $.cookie("userid", res.data['userid']);
                     $.cookie("nickname", res.data['nickname']);
+                    $.cookie("email", res.data['email']);
                     $location.path("/home");
                 }
                 else {
@@ -843,7 +980,17 @@ app.controller("LoginCtrl", function ($scope, $http, $location) {
                 $scope.message = 'Network outage!';
             }
         );
-    }
+    };
+
+    $scope.forget = function () {
+        $scope.recovermessage = "验证邮件已经发送，请注意查收";
+        $("button#recover_btn").html("重新发送");
+    };
+
+    $scope.PopModal = function () {
+        $("button#recover_btn").html("发送邮件");
+        $("div.modal#forget_pass_modal").modal("show");
+    };
 });
 
 app.controller("RegisterCtrl", function ($scope, $http, $location) {

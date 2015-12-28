@@ -28,6 +28,9 @@
                         <li class="list-group-item text-center">
                             <input type="text" ng-model="friend.find" placeholder="查找好友" class="form-control" ng-change="friend.Search()">
                         </li>
+                        <li class="list-group-item select context-me" data-toggle="context" data-target="#context-me-menu" data-id="{{ userid }}" data-kind="me" data-name="{{ nickname }}" ng-click="profile.InfoWindow()">
+                            <strong data-toggle="tooltip" tooltip-placement="left" tooltip="ID: {{ userid }}">我</strong>
+                        </li>
                         <li class="list-group-item search-result" ng-repeat="x in friend.search" data-id="{{ x.userid }}" ng-click="friend.SearchClick($event)">
                             <strong data-toggle="tooltip" tooltip-placement="left" tooltip="ID: {{ x.userid }}" >{{ x.nickname }}</strong>
                         </li>
@@ -39,6 +42,7 @@
                             <span class="badge" id="badge-friend-{{ x.userid }}"></span>
                         </li>
                     </ul>
+                    
                     <div id="context-friend-menu" style="position: absolute; z-index: 9999; top: 389px; left: 558px;" class="">
                         <ul class="dropdown-menu" role="menu">
                             <li data-action="chat"><a tabindex="-1">发起聊天</a></li>
@@ -46,6 +50,101 @@
                             <li class="divider"></li>
                             <li data-action="delete"><a tabindex="-1">删除好友</a></li>
                         </ul>
+                    </div>
+
+                    <div id="context-me-menu" style="position: absolute; z-index: 9999; top: 389px; left: 558px;" class="">
+                        <ul class="dropdown-menu" role="menu">
+                            <li data-action="update_profile"><a tabindex="-1">个人资料</a></li>
+                            <li class="divider"></li>
+                            <li data-action="update_pass"><a tabindex="-1">修改密码</a></li>
+                            <li class="divider"></li>
+                            <li data-action="logout"><a tabindex="-1">登出</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="modal fade" id="update_profile_modal" tabindex"-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times</button>
+                                    <h4 class="modal-title">完善个人资料</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form class="form text-left" role="form" action="#" method="post" accept-charset="utf-8" onsubmit="return false;" ng-submit="profile.UpdateProfile()">
+                                        <div class="form-group">
+                                            <label for="n_userid" class="control-label">用户 ID</label>
+                                            <input class="form-control" ng-disabled="true" type="text" id="n_userid" value="{{ userid }}" placeholder="ID">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="n_nickname" class="control-label">用户昵称</label>
+                                            <input class="form-control" type="text" ng-model="profile.n_nickname" placeholder="昵称" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="n_email" class="control-label">用户邮箱</label>
+                                            <input class="form-control" type="email" ng-model="profile.n_email" placeholder="邮箱" required>
+                                        </div>
+                                        <div ng-if="profile.updatemessage">
+                                            <span ng-bind="profile.updatemessage" class="form-control alert alert-info text-center"></span>
+                                        </div>
+                                        <div ng-if="profile.updateerror">
+                                            <span ng-bind="profile.updateerror" class="form-control alert alert-danger text-center"></span>
+                                        </div>
+                                        <div class="form-group btn-group btn-group-justified" role="group">
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="from-control btn btn-default" data-dismiss="modal">取消</button>
+                                            </div>
+                                            <div class="btn-group" role="group">
+                                                <button type="submit" class="from-control btn btn-primary">提交修改</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <!-- space -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="update_pass_modal" tabindex"-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times</button>
+                                    <h4 class="modal-title">修改密码</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form class="form" role="form" action="#" method="post" accept-charset="utf-8" onsubmit="return false;" ng-submit="profile.UpdatePass()">
+                                        <div class="form-group">
+                                            <input class="form-control" type="password" ng-model="profile.n_pass_old" placeholder="旧密码" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <input class="form-control" type="password" ng-model="profile.n_pass" placeholder="新密码" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <input class="form-control" type="password" ng-model="profile.n_pass_again" placeholder="重复新密码" required>
+                                        </div>
+                                         <div ng-if="profile.updatepassmessage">
+                                            <span ng-bind="profile.updatepassmessage" class="form-control alert alert-info text-center"></span>
+                                        </div>
+                                        <div ng-if="profile.updatepasserror">
+                                            <span ng-bind="profile.updatepasserror" class="form-control alert alert-danger text-center"></span>
+                                        </div>
+                                        <div class="form-group btn-group btn-group-justified" role="group">
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="from-control btn btn-default" data-dismiss="modal">取消</button>
+                                            </div>
+                                            <div class="btn-group" role="group">
+                                                <button type="submit" class="from-control btn btn-primary">提交修改</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <!-- space -->
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="modal fade" id="make_friends_modal" tabindex"-1" role="dialog" aria-hidden="true">
@@ -209,7 +308,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="description">群组描述</label>
-                                            <textarea class="form-control" name="description" rows="3" ng-model="group.newdesc"></textarea>
+                                            <textarea class="form-control" name="description" rows="3" ng-model="group.newdesc" placeholder="群组描述"></textarea>
                                         </div>
                                         <div ng-if="group.createerror">
                                             <span ng-bind="group.createerror" class="form-control alert alert-danger text-center"></span>
@@ -375,7 +474,7 @@
                                         <label>创建新留言</label>
                                         <div class="input-group">
                                             <!-- <textarea class="form-control" name="description" rows="3" max-length="512" ng-model="room.newnote" placeholder="新留言" autocomplete="off"></textarea> -->
-                                            <input type="text" maxlength="512" autocomplete="off" class="form-control" name="nextmsg" ng-model="room.newnote" value="" placeholder="新留言">
+                                            <input type="text" ng-maxlength="512" autocomplete="off" class="form-control" name="nextmsg" ng-model="room.newnote" value="" placeholder="新留言">
                                             <span class="input-group-btn">
                                                 <button class="btn btn-default form-control" type="submit">发布</button>
                                             </span>
