@@ -44,6 +44,8 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
     $scope.email = $.cookie('email') || '';
 
     $scope.friend = {
+        info: {},
+
         BindContext: function () {
             $('.context-friend').contextmenu({
                 target:'#context-friend-menu', 
@@ -237,6 +239,8 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
     };
 
     $scope.group = {
+        info: {},
+
         BindContext: function () {
             $('.context-group').contextmenu({
                 target:'#context-group-menu', 
@@ -490,6 +494,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
     $scope.room = {
         boardid: '0',
         note: [],
+        info: {},
         
         BindContext: function () {
             $('.context-room').contextmenu({
