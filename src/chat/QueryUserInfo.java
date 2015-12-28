@@ -25,7 +25,7 @@ public class QueryUserInfo extends HttpServlet {
         ReqReader reader = new ReqReader(request.getInputStream());
         ResWriter writer = new ResWriter(response.getOutputStream());
 
-        String username;
+        String username, targetid;;
         HttpSession session = request.getSession();
         if (session.getAttribute("userid") != null) {
             username = (String)session.getAttribute("userid");
@@ -35,8 +35,9 @@ public class QueryUserInfo extends HttpServlet {
             response.setStatus(401);
             return; // no valid userid.
         }
+        targetid = reader.getString("targetid");
 
-        if (username == "" ) {
+        if (username == "" || targetid == "" ) {
             writer.add("status", "failed").write();
             return;
         }
@@ -49,7 +50,7 @@ public class QueryUserInfo extends HttpServlet {
         String email = null, userid = null, nickname = null;
         try {
             ps = conn.prepareStatement(sql);
-            ps.setString(1, username);
+            ps.setString(1, targetid);
             rs = ps.executeQuery();
             if (rs.next()) {
                 email = rs.getString("email");
