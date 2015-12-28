@@ -1,0 +1,519 @@
+\documentclass[a4paper,12pt,landscape,UTF8]{ctexart}
+
+%----------------------------------------------------------------------------------------
+%       Localization
+%----------------------------------------------------------------------------------------
+
+
+\usepackage[landscape]{geometry}
+\usepackage{graphicx}
+
+\usepackage{tikz-er2}
+%%%<
+\usepackage{verbatim}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{5pt}%
+%%%>
+
+\begin{comment}
+\end{comment}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\usetikzlibrary{positioning}
+\usetikzlibrary{shadows}
+\usetikzlibrary{calc}
+
+\tikzstyle{every entity} = [top color=white, bottom color=blue!30, draw=blue!50!black!100, drop shadow]
+\tikzstyle{every weak entity} = [drop shadow={shadow xshift=.7ex, shadow yshift=-.7ex}]
+\tikzstyle{every attribute} = [top color=white, bottom color=yellow!20, draw=yellow, node distance=1cm, drop shadow]
+\tikzstyle{every relationship} = [top color=white, bottom color=red!20, draw=red!50!black!100, drop shadow]
+\tikzstyle{every isa} = [top color=white, bottom color=green!20, draw=green!50!black!100, drop shadow]
+
+% Defines a `datastore' shape for use in DFDs.  This inherits from a
+% rectangle and only draws two horizontal lines.
+\makeatletter
+\pgfdeclareshape{datastore}{
+  \inheritsavedanchors[from=rectangle]
+  \inheritanchorborder[from=rectangle]
+  \inheritanchor[from=rectangle]{center}
+  \inheritanchor[from=rectangle]{base}
+  \inheritanchor[from=rectangle]{north}
+  \inheritanchor[from=rectangle]{north east}
+  \inheritanchor[from=rectangle]{east}
+  \inheritanchor[from=rectangle]{south east}
+  \inheritanchor[from=rectangle]{south}
+  \inheritanchor[from=rectangle]{south west}
+  \inheritanchor[from=rectangle]{west}
+  \inheritanchor[from=rectangle]{north west}
+  \backgroundpath{
+    %  store lower right in xa/ya and upper right in xb/yb
+    \southwest \pgf@xa=\pgf@x \pgf@ya=\pgf@y
+    \northeast \pgf@xb=\pgf@x \pgf@yb=\pgf@y
+    \pgfpathmoveto{\pgfpoint{\pgf@xa}{\pgf@ya}}
+    \pgfpathlineto{\pgfpoint{\pgf@xb}{\pgf@ya}}
+    \pgfpathmoveto{\pgfpoint{\pgf@xa}{\pgf@yb}}
+    \pgfpathlineto{\pgfpoint{\pgf@xb}{\pgf@yb}}
+ }
+}
+\makeatother
+
+\tikzstyle{double_link} = [link, double, double distance=8pt]
+
+\centering
+\begin{tikzpicture}[
+  font=\sffamily, minimum height=0.5cm,minimum width=1cm,
+  every matrix/.style={ampersand replacement=\&,column sep=1cm,row sep=1.25 cm},
+  source/.style={draw,thick,rounded corners,fill=yellow!20,inner sep=.3cm},
+  process/.style={draw,ellipse,thick,fill=blue!20},
+  sink/.style={source,fill=green!20},
+  datastore/.style={draw,very thick,shape=datastore,inner sep=.3cm},
+  dots/.style={gray,scale=2},
+  to/.style={->,>=stealth',shorten >=1pt,semithick,font=\sffamily\footnotesize},
+  every node/.style={align=center}]
+
+  % Position the nodes using a matrix layout
+  \matrix{
+      \& \& \& \node[source] (user) {用户}; \\
+   
+      \node[process] (frind_chat) {好友聊天};
+      \&
+      \& \node[process] (group_chat) {群组聊天};
+      \&
+      \& \node[process] (enter_room) {进入聊天室};
+      \&
+      \& \node[process] (make_note) {发布留言}; \\
+
+      \& \& \& \& \node[process] (start_chat) {开始聊天}; \\
+
+      \node[datastore] (friend_record) {好友\\聊天记录表};
+      \& \node[datastore] (message_tb) {消息表};
+      \& \node[datastore] (group_chat_record) {群组\\聊天记录表};
+      \&
+      \& \node[datastore] (room_chat_record) {聊天室\\聊天记录表};
+      \& \node[datastore] (note_tb) {留言表};
+      \& \node[datastore] (note_room_tb) {留言-聊天室 \\ 关联表}; \\
+  };
+
+  % Draw the arrows between the nodes and label them.
+  \draw[->] (user) -| node[midway,below] {好友聊天请求} (frind_chat);
+  \draw[->] (user) -| node[midway,below] {群组聊天请求} (group_chat);
+  \draw[->] (user) -| node[midway,below] {聊天室聊天请求} (enter_room);
+  \draw[->] (enter_room) -- node[midway,above] {聊天} (start_chat);
+  \draw[->] (user) -| node[midway,below] {留言请求} (make_note);
+  \draw[->] (frind_chat) -- (friend_record);
+  \draw[->] (group_chat) -- (group_chat_record);
+  \draw[->] (frind_chat) -- (message_tb);
+  \draw[->] (group_chat) -- (message_tb);
+
+  \draw[->] (start_chat) -- (room_chat_record);
+  \draw[->] (make_note) -- (note_tb);
+  \draw[->] (make_note) -- (note_room_tb);
+\end{tikzpicture}
+
+\centering
+\begin{tikzpicture}[
+  font=\sffamily, minimum height=0.5cm,minimum width=1cm,
+  every matrix/.style={ampersand replacement=\&,column sep=2cm,row sep=1 cm},
+  source/.style={draw,thick,rounded corners,fill=yellow!20,inner sep=.3cm},
+  process/.style={draw,ellipse,thick,fill=blue!20},
+  sink/.style={source,fill=green!20},
+  datastore/.style={draw,very thick,shape=datastore,inner sep=.3cm},
+  dots/.style={gray,scale=2},
+  to/.style={->,>=stealth',shorten >=1pt,semithick,font=\sffamily\footnotesize},
+  every node/.style={align=center}]
+
+  \matrix{
+      \node[source] (sender) {发送者};
+      \& \node[process] (finder) {查找该群组};
+      \& \node[process] (judge) {是否已加入};
+      \& \node[process] (generator) {发送加入群组请求};
+      \& \node[sink] (receiver) {目标群组}; \\
+
+      \& \node[datastore] (groupinfo_tb) {群组信息表};
+      \&
+      \& \node[datastore] (group_rela_tb) {群组归属表}; \\
+
+      \& \& \& \& \node[process] (confirm) {验证通过}; \\
+  };
+
+  % Draw the arrows between the nodes and label them.
+  \draw[->] (sender) -- node[midway,below] {请求} (finder);
+  \draw[->] (finder) -- node[midway,below] {查找结果} (judge);
+  \draw[->] (judge) -- node[midway,below] {请求} (generator);
+  \draw[->] (generator) -- node[midway,below] {请求} (receiver);
+  \draw[->] (receiver) -- node[midway,left] {确认} (confirm);
+  \draw[->] (confirm) -| node[midway,above] {通过验证} (sender);
+  \draw[<->] (finder) -- (groupinfo_tb);
+  \draw[<->] (judge) -- (group_rela_tb);
+  \draw[->] (confirm) -- (group_rela_tb);
+\end{tikzpicture}
+
+
+\centering
+\begin{tikzpicture}[
+  font=\sffamily, minimum height=0.5cm,minimum width=1cm,
+  every matrix/.style={ampersand replacement=\&,column sep=2cm,row sep=1 cm},
+  source/.style={draw,thick,rounded corners,fill=yellow!20,inner sep=.3cm},
+  process/.style={draw,ellipse,thick,fill=blue!20},
+  sink/.style={source,fill=green!20},
+  datastore/.style={draw,very thick,shape=datastore,inner sep=.3cm},
+  dots/.style={gray,scale=2},
+  to/.style={->,>=stealth',shorten >=1pt,semithick,font=\sffamily\footnotesize},
+  every node/.style={align=center}]
+
+  \matrix{
+      \node[source] (sender) {发送者};
+      \& \node[process] (finder) {查找该用户};
+      \& \node[process] (judge) {是否为好友};
+      \& \node[process] (generator) {发送添加好友请求};
+      \& \node[sink] (receiver) {目标用户}; \\
+
+      \& \node[datastore] (userinfo_tb) {用户信息表};
+      \&
+      \& \node[datastore] (friends_tb) {好友联系表}; \\
+
+      \& \& \& \& \node[process] (confirm) {好友验证通过}; \\
+  };
+
+  % Draw the arrows between the nodes and label them.
+  \draw[->] (sender) -- node[midway,below] {请求} (finder);
+  \draw[->] (finder) -- node[midway,below] {查找结果} (judge);
+  \draw[->] (judge) -- node[midway,below] {请求} (generator);
+  \draw[->] (generator) -- node[midway,below] {请求} (receiver);
+  \draw[->] (receiver) -- node[midway,left] {确认} (confirm);
+  \draw[->] (confirm) -| node[midway,above] {通过验证} (sender);
+  \draw[<->] (finder) -- (userinfo_tb);
+  \draw[<->] (judge) -- (friends_tb);
+  \draw[->] (confirm) -- (friends_tb);
+\end{tikzpicture}
+
+
+
+\centering
+\begin{tikzpicture}[
+  font=\sffamily, minimum height=0.5cm,minimum width=1cm,
+  every matrix/.style={ampersand replacement=\&,column sep=3cm,row sep=1 cm},
+  source/.style={draw,thick,rounded corners,fill=yellow!20,inner sep=.3cm},
+  process/.style={draw,ellipse,thick,fill=blue!20},
+  sink/.style={source,fill=green!20},
+  datastore/.style={draw,very thick,shape=datastore,inner sep=.3cm},
+  dots/.style={gray,scale=2},
+  to/.style={->,>=stealth',shorten >=1pt,semithick,font=\sffamily\footnotesize},
+  every node/.style={align=center}]
+
+  % Position the nodes using a matrix layout
+  \matrix{
+      \node[source] (sender) {发送者};
+      \& \node[process] (judge) {是否为好友};
+      \& \node[process] (transfer) {转发器}; 
+      \& \node[sink] (receiver) {接收者}; \\
+
+      \& \node[datastore] (friends_tb) {好友联系表};
+      \& \node[datastore] (message_tb) {消息表};
+      \& \node[datastore] (chat_record_tb) {聊天记录表}; \\
+  };
+
+  % Draw the arrows between the nodes and label them.
+  \draw[->] (sender) -- node[midway,below] {消息} (judge);
+  \draw[->] (judge) -- node[midway,below] {消息} (transfer);
+  \draw[->] (transfer) -- node[midway,below] {消息} (receiver);
+  \draw[<->] (judge) -- (friends_tb);
+  \draw[->] (transfer) -- (message_tb);
+  \draw[->] (transfer) -- (chat_record_tb);
+\end{tikzpicture}
+
+
+\centering
+\begin{tikzpicture}[
+  font=\sffamily, minimum height=0.5cm,minimum width=1cm,
+  every matrix/.style={ampersand replacement=\&,column sep=1cm,row sep=1.25 cm},
+  source/.style={draw,thick,rounded corners,fill=yellow!20,inner sep=.3cm},
+  process/.style={draw,ellipse,thick,fill=blue!20},
+  sink/.style={source,fill=green!20},
+  datastore/.style={draw,very thick,shape=datastore,inner sep=.3cm},
+  dots/.style={gray,scale=2},
+  to/.style={->,>=stealth',shorten >=1pt,semithick,font=\sffamily\footnotesize},
+  every node/.style={align=center}]
+
+  % Position the nodes using a matrix layout
+  \matrix{
+      \& \& \& \node[source] (user) {用户}; \\
+   
+      \& \node[process] (find_friend) {是否为好友关系};
+      \& \& \&
+      \& \node[process] (find_group) {是否该群组成员}; \\
+
+      \node[process] (make_friends) {加好友};
+      \& \node[process] (del_friend) {删除好友};
+      \& \node[process] (view_friends) {查询所有好友};
+      \&
+      \& \node[process] (join_group) {加入群组};
+      \& \node[process] (quit_group) {退出群组};
+      \& \node[process] (view_groups) {查询所有群组}; \\
+
+      \node[datastore] (userinfo_tb) {个人信息表};
+      \& \node[datastore] (friends_tb) {好友联系表};
+      \&
+      \&
+      \& \node[datastore] (group_info_tb) {群组信息表};
+      \& \node[datastore] (group_rela_tb) {群组归属表}; \\
+  };
+
+  % Draw the arrows between the nodes and label them.
+  \draw[->] (user) -| node[midway,below] {好友申请} (make_friends);
+  \draw[->] (user) -| node[midway,below] {加入群组请求} (join_group);
+  \draw[->] (user) -| node[midway,below] {好友列表请求} (view_friends);
+  \draw[->] (user) -| node[midway,below] {群组列表请求} (view_groups);
+  \draw[->] (user) -| node[midway,below] {删除请求} (find_friend);
+  \draw[->] (user) -| node[midway,below] {退出请求} (find_group);
+  \draw[<->] (make_friends) -- (userinfo_tb);
+  \draw[->] (make_friends) -- (friends_tb);
+  \draw[->] (del_friend) -- (friends_tb);
+  \draw[<->] (view_friends) -- (friends_tb);
+  \draw[<->] (join_group) -- (group_info_tb);
+  \draw[->] (join_group) -- (group_rela_tb);
+  \draw[->] (quit_group) -- (group_rela_tb);
+  \draw[<->] (view_groups) -- (group_rela_tb);
+  \draw[->] (find_friend) -- node[midway,above] {查询结果} (del_friend);
+  \draw[->] (find_group) -- node[midway,above] {查询结果} (quit_group);
+
+\end{tikzpicture}
+
+
+\centering
+\begin{tikzpicture}[
+  font=\sffamily,
+  every matrix/.style={ampersand replacement=\&,column sep=5cm,row sep=0.1cm},
+  source/.style={draw,thick,rounded corners,fill=yellow!20,inner sep=.3cm},
+  process/.style={draw,thick,ellipse,fill=blue!20,},
+  sink/.style={source,fill=green!20},
+  datastore/.style={draw,very thick,shape=datastore,inner sep=.3cm},
+  dots/.style={gray,scale=2},
+  to/.style={->,>=stealth',shorten >=1pt,semithick,font=\sffamily\footnotesize},
+  every node/.style={align=center}]
+
+  % Position the nodes using a matrix layout
+  \matrix{
+    \node[source] (user) {用户};
+      \& \node[process] (system) {聊天系统}; \\
+  };
+
+  % Draw the arrows between the nodes and label them.
+  \draw[to] (system) -- node[above] {响应用户请求} (user);
+  \draw[->] (user) -- ($(user.north)+(0, 2)$) -- node[midway,above] {维护用户信息请求} ($(system.north)+(0,2)$)-- (system);
+  \draw[->] (user) -- ($(user.north)+(0, 1)$) -- node[midway,above] {用户联系管理请求} ($(system.north)+(0,1)$)-- (system);
+  \draw[->] (user) -- ($(user.south)+(0, -1)$) -- node[midway,above] {聊天请求} ($(system.south)+(0,-1)$)-- (system);
+  \draw[->] (user) -- ($(user.south)+(0, -2)$) -- node[midway,above] {留言请求} ($(system.south)+(0,-2)$)-- (system);
+\end{tikzpicture}
+
+\centering
+\begin{tikzpicture}[
+  font=\sffamily, minimum height=0.5cm,minimum width=1cm,
+  every matrix/.style={ampersand replacement=\&,column sep=2cm,row sep=0.3 cm},
+  source/.style={draw,thick,rounded corners,fill=yellow!20,inner sep=.3cm},
+  process/.style={draw,ellipse,thick,fill=blue!20},
+  sink/.style={source,fill=green!20},
+  datastore/.style={draw,very thick,shape=datastore,inner sep=.3cm},
+  dots/.style={gray,scale=2},
+  to/.style={->,>=stealth',shorten >=1pt,semithick,font=\sffamily\footnotesize},
+  every node/.style={align=center}]
+
+  % Position the nodes using a matrix layout
+  \matrix{
+      \& \node[process] (login) {授权模块}; \\
+
+    \node[source] (user) {用户};
+      \& \node[process] (register) {用户注册};
+      \& \node[datastore] (userinfo_tb) {用户信息表}; \\
+      
+      \& \node[process] (update) {更新用户信息}; \\
+  };
+
+  % Draw the arrows between the nodes and label them.
+  \draw[->] (user) |- node[midway,above] {登陆} (login);
+  \draw[->] (user) -- node[midway,above] {注册} (register);
+  \draw[->] (user) |- node[midway,below] {更新信息} (update);
+  \draw[<->] (login) -| (userinfo_tb);
+  \draw[<->] (register) -- (userinfo_tb);
+  \draw[<->] (update) -| (userinfo_tb);
+
+\end{tikzpicture}
+
+\centering
+\scalebox{.87}{
+\begin{tikzpicture}[node distance=1.5cm, every edge/.style={link}]
+
+  \node[entity] (user) {用户};
+  \node[attribute] (uid) [above left=of user] {\key{用户号}} edge (user);
+  \node[attribute] (upass) [below left=of user] {用户密码} edge (user);
+  \node[attribute] (uname) [below=of user] {用户昵称} edge (user);
+  \node[attribute] (uemail) [above=of user] {用户邮箱} edge (user);
+
+  \node[relationship] (frind) [left=3cm of user] {好友关系} edge [double_link] node[above]{1} node[below]{1} (user);
+  \node[attribute] (friend_state) [below=3cm of frind] {验证状态} edge node[right]{1} (frind);
+  \node[relationship] (messaging) [right=6cm of user] {发消息} edge node[above]{1} (user);
+  \node[relationship] (belong_group) [below left=3.7cm of messaging] {群组归属} edge node[below]{n} (user);
+  \node[relationship] (friend_record) [above=1cm of messaging] {聊天记录} edge [double_link] node[above]{1} node[below]{1} (user);
+
+  \node[entity] (group) [below=5cm of messaging]{群组} edge node[above]{1} (belong_group);
+  \node[attribute] (gid) [right=of group] {\key{群组号}} edge (group);
+  \node[attribute] (gname) [below left=of group] {群组名称} edge (group);
+  \node[attribute] (gname) [above=of group] {群组管理员} edge (group);
+  \node[attribute] (gdesc) [below=of group] {群组说明} edge (group);
+
+  \node[relationship] (chatroom_state) [below=8cm of user] {聊天室状态} edge node[right]{n} (user);
+
+  \node[relationship] (make_note) [above=4cm of user] {发布留言} edge node[right]{1} (user);
+
+  \node[entity] (note) [above=4.2cm of messaging] {留言} edge node[above]{1} (make_note);
+  \node[attribute] (nid) [above=of note] {\key{留言号}} edge (note);
+  \node[attribute] (ntime) [above left=of note] {留言时间} edge (note);
+  \node[attribute] (ncontent) [above right=of note] {留言内容} edge (note);
+
+  \node[relationship] (board_state) [right=6cm of note] {留言板状态} edge node[above]{n} (note);
+
+  \node[entity] (board) [right=4cm of board_state]{留言板} edge node[above]{1} (board_state);
+  \node[attribute] (bid) [below left=of board] {\key{留言板号}} edge (board);
+
+  \node[entity] (message) [right=6cm of messaging]{消息} edge node[above]{n} (messaging) edge node[above]{n} (friend_record);
+  \node[attribute] (mid) [right=of message] {\key{消息号}} edge (message);
+  \node[attribute] (mtime) [above=of message] {发出时间} edge (message);
+  \node[attribute] (mcontent) [above right=of message] {消息内容} edge (message);
+  \node[attribute] (mstatus) [below right=of message] {阅读状态} edge (message);
+
+  \node[relationship] (group_chat_record) [below right=3.4cm of messaging] {群组聊天记录} edge node[above]{1} (group) edge node[above]{n} (message);
+  \node[relationship] (room_chat_record) [below=2cm of message] {聊天室聊天记录} edge node[right]{n} (message);
+
+  \node[entity] (room) [below=3cm of room_chat_record]{聊天室} edge node[right]{1} (room_chat_record) edge node[above]{1} (chatroom_state);
+  \node[attribute] (rid) [above right=of room] {\key{聊天室号}} edge (room);
+  \node[attribute] (rname) [below=of room] {聊天室名称} edge (room);
+  \node[attribute] (rdesc) [below right=of room] {聊天室介绍} edge (room);
+
+  \node[relationship] (room_board) [right=4.5cm of room]{留言板归属} edge node[right]{1} (board) edge node[above]{1} (room);
+
+\end{tikzpicture}
+}
+
+\centering
+\scalebox{.87}{
+\begin{tikzpicture}[node distance=1.5cm, every edge/.style={link}]
+
+  \node[entity] (user) {用户};
+
+  \node[relationship] (frind) [left=3cm of user] {好友关系} edge [double_link] node[above]{1} node[below]{1} (user);
+  \node[relationship] (messaging) [right=6cm of user] {发消息} edge node[above]{1} (user);
+  \node[relationship] (belong_group) [below left=3.7cm of messaging] {群组归属} edge node[below]{n} (user);
+  \node[relationship] (friend_record) [above=1cm of messaging] {聊天记录} edge [double_link] node[above]{1} node[below]{1} (user);
+
+  \node[entity] (group) [below=5cm of messaging]{群组} edge node[above]{1} (belong_group);
+
+  \node[relationship] (chatroom_state) [below=8cm of user] {聊天室状态} edge node[right]{n} (user);
+
+  \node[relationship] (make_note) [above=4cm of user] {发布留言} edge node[right]{1} (user);
+
+  \node[entity] (note) [above=4.2cm of messaging] {留言} edge node[above]{1} (make_note);
+
+  \node[relationship] (board_state) [right=6cm of note] {留言板状态} edge node[above]{n} (note);
+
+  \node[entity] (board) [right=4cm of board_state]{留言板} edge node[above]{1} (board_state);
+
+  \node[entity] (message) [right=6cm of messaging]{消息} edge node[above]{n} (messaging) edge node[above]{n} (friend_record);
+
+  \node[relationship] (group_chat_record) [below right=3.4cm of messaging] {群组聊天记录} edge node[above]{1} (group) edge node[above]{n} (message);
+  \node[relationship] (room_chat_record) [below=2cm of message] {聊天室聊天记录} edge node[right]{n} (message);
+
+  \node[entity] (room) [below=3cm of room_chat_record]{聊天室} edge node[right]{1} (room_chat_record) edge node[above]{1} (chatroom_state);
+
+  \node[relationship] (room_board) [right=4.5cm of room]{留言板归属} edge node[right]{1} (board) edge node[above]{1} (room);
+
+\end{tikzpicture}
+}
+
+\centering
+\scalebox{.87}{
+\begin{tikzpicture}[node distance=1.5cm, every edge/.style={link}]
+
+  \node[entity] (user) {用户};
+  \node[attribute] (uid) [above=of user] {\key{用户号}} edge (user);
+  \node[attribute] (upass) [left=of user] {用户密码} edge (user);
+  \node[attribute] (uname) [above left=of user] {用户昵称} edge (user);
+  \node[attribute] (uemail) [right=of user] {用户邮箱} edge (user);
+\end{tikzpicture}
+}
+
+\centering
+\scalebox{.87}{
+\begin{tikzpicture}[node distance=1.5cm, every edge/.style={link}]
+
+  \node[entity] (group) {群组};
+  \node[attribute] (gid) [above left=of group] {\key{群组号}} edge (group);
+  \node[attribute] (gname) [above=of group] {群组名称} edge (group);
+  \node[attribute] (gdesc) [above right=of group] {群组说明} edge (group);
+\end{tikzpicture}
+}
+
+
+\centering
+\scalebox{.87}{
+\begin{tikzpicture}[node distance=1.5cm, every edge/.style={link}]
+
+  \node[entity] (room) {聊天室};
+  \node[attribute] (rid) [above left=of room] {\key{聊天室号}} edge (room);
+  \node[attribute] (rname) [above=of room] {聊天室名称} edge (room);
+  \node[attribute] (rdesc) [above right=of room] {聊天室介绍} edge (room);
+\end{tikzpicture}
+}
+
+\centering
+\scalebox{.87}{
+\begin{tikzpicture}[node distance=1.5cm, every edge/.style={link}]
+
+  \node[entity] (board) {留言板};
+  \node[attribute] (bid) [left=of board] {\key{留言板号}} edge (board);
+\end{tikzpicture}
+}
+
+\centering
+\scalebox{.87}{
+\begin{tikzpicture}[node distance=1.5cm, every edge/.style={link}]
+
+  \node[entity] (note) {留言};
+  \node[attribute] (nid) [above=of note] {\key{留言号}} edge (note);
+  \node[attribute] (ntime) [above left=of note] {留言时间} edge (note);
+  \node[attribute] (ncontent) [above right=of note] {留言内容} edge (note);
+\end{tikzpicture}
+}
+
+\centering
+\scalebox{.87}{
+\begin{tikzpicture}[node distance=1.5cm, every edge/.style={link}]
+  \node[entity] (message) {消息};
+  \node[attribute] (mid) [above=of message] {\key{消息号}} edge (message);
+  \node[attribute] (mtime) [above left=of message] {发出时间} edge (message);
+  \node[attribute] (mcontent) [above right=of message] {消息内容} edge (message);
+  \node[attribute] (mstatus) [right=of message] {阅读状态} edge (message);
+\end{tikzpicture}
+}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
