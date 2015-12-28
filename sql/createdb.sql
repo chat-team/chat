@@ -123,7 +123,7 @@ DELIMITER $$
 CREATE PROCEDURE add_user(IN nickname_user varchar(30),IN passwd_user varchar(32), IN email_user varchar(20))
 BEGIN
 INSERT INTO user_info(nickname, passwd, email) VALUES (nickname_user, passwd_user, email_user);
-SELECT userid FROM user_info ORDER BY userid DESC LIMIT 1;
+SELECT userid FROM u、ser_info ORDER BY userid DESC LIMIT 1;
 END;
 $$
 DELIMITER ;
@@ -136,3 +136,10 @@ SELECT messageid, ctime FROM message ORDER BY messageid DESC LIMIT 1;
 END;
 $$
 DELIMITER ;
+
+insert into chatroom(roomname, description) values ("Dollars", "网络社群");
+insert into chatroom(roomname, description) values ("曲终人散", "音乐兴趣聊天室");
+insert into chatroom(roomname, description) values ("天使齐飞", "关爱筑巢老人大家庭 助爱公益行");
+insert into chatroom(roomname, description) values ("米粉聊天室", "小米粉丝讨论区");
+insert into chatroom(roomname, description) values ("唐山老乡会", "同乡聊天室~");
+insert into chatroom(roomname, description) values ("技术让世界更美好", "IT互联网行业交流");
