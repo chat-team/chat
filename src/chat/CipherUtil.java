@@ -1,7 +1,9 @@
 package chat;
 
-import sun.misc.BASE64Encoder;
+import javax.xml.bind.DatatypeConverter; // for java 7. (in java 8, use java.util.Base64)
+
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -15,9 +17,10 @@ public class CipherUtil {
 
         //确定计算方法
         MessageDigest md5 = MessageDigest.getInstance("MD5");
-        BASE64Encoder base64en = new BASE64Encoder();
+
         //加密后的字符串
-        String newstr = base64en.encode(md5.digest(str.getBytes("utf-8")));
+        String newstr = DatatypeConverter.printBase64Binary(md5.digest(str.getBytes(StandardCharsets.UTF_8)));
+
         return newstr;
     }
 
