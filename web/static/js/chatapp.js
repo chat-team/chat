@@ -56,8 +56,11 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                     if (action === "chat") {
                         $(context.context).click();
                     }
-                    else if (action === "delete"){
+                    else if (action === "delete") {
                         $scope.friend.Delete(userid);
+                    }
+                    else if (action === "view_info") {
+                        $scope.friend.ViewInfo(userid);
                     }
                     else {
                         $scope.friend.ViewRecord(userid);
@@ -204,6 +207,33 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                 }
             );
         },
+
+        ViewInfo: function (userid) {
+            $http({
+                method: "POST",
+                url: "/queryuserinfo",
+                data: {
+                    targetid: userid,
+                },
+            }).then(
+                function (res) {
+                    if (res.data['status'] === "success") {
+                        $scope.friend.info.userid = res.data['userid'];
+                        $scope.friend.info.nickname = res.data['nickname'];
+                        $scope.friend.info.email = res.data['email'];
+                        $timeout(function () {
+                            $("div.modal#view_friend_info_modal").modal("show");
+                        });
+                    }
+                    else {
+                        //
+                    }
+                },
+                function (res) {
+                    console.log(res);
+                }
+            );
+        },
     };
 
     $scope.group = {
@@ -220,8 +250,11 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                     if (action === "chat") {
                         $(context.context).click();
                     }
-                    else if(action === "delete") {
+                    else if (action === "delete") {
                         $scope.group.Delete(groupid);
+                    }
+                    else if (action === "view_info") {
+                        $scope.group.ViewInfo(groupid);
                     }
                     else {
                         $scope.group.ViewRecord(groupid);
@@ -424,6 +457,34 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                 }
             );
         },
+
+        ViewInfo: function (groupid) {
+            $http({
+                method: "POST",
+                url: "/querygroupinfo",
+                data: {
+                    targetid: groupid,
+                },
+            }).then(
+                function (res) {
+                    if (res.data['status'] === "success") {
+                        $scope.group.info.groupid = res.data['groupid'];
+                        $scope.group.info.admin = res.data['admin'];
+                        $scope.group.info.groupname = res.data['groupname'];
+                        $scope.group.info.description = res.data['description'];
+                        $timeout(function () {
+                            $("div.modal#view_group_info_modal").modal("show");
+                        });
+                    }
+                    else {
+                        //
+                    }
+                },
+                function (res) {
+                    console.log(res);
+                }
+            );
+        },
     };
 
     $scope.room = {
@@ -442,6 +503,9 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
                     if (action === "enter") {
                         // enter.
                         $(context.context).click();
+                    }
+                    else if (action === "view_info") {
+                        $scope.room.ViewInfo(roomid);
                     }
                     else {
                         // view notes.
@@ -568,6 +632,33 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             $timeout(function () { //  DO NOT break out of the current $apply() cycle. 
                 $("div#rooms > ul > li[data-id='" + roomid + "']").trigger("click");
             });
+        },
+
+        ViewInfo: function (roomid) {
+            $http({
+                method: "POST",
+                url: "/queryroominfo",
+                data: {
+                    targetid: roomid,
+                },
+            }).then(
+                function (res) {
+                    if (res.data['status'] === "success") {
+                        $scope.room.info.roomid = res.data['roomid'];
+                        $scope.room.info.roomname = res.data['roomname'];
+                        $scope.room.info.description = res.data['description'];
+                        $timeout(function () {
+                            $("div.modal#view_room_info_modal").modal("show");
+                        });
+                    }
+                    else {
+                        //
+                    }
+                },
+                function (res) {
+                    console.log(res);
+                }
+            );
         },
     };
 

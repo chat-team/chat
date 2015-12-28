@@ -46,6 +46,7 @@
                     <div id="context-friend-menu" style="position: absolute; z-index: 9999; top: 389px; left: 558px;" class="">
                         <ul class="dropdown-menu" role="menu">
                             <li data-action="chat"><a tabindex="-1">发起聊天</a></li>
+                            <li data-action="view_info"><a tabindex="-1">用户信息</a></li>
                             <li data-action="view_record"><a tabindex="-1">聊天记录</a></li>
                             <li class="divider"></li>
                             <li data-action="delete"><a tabindex="-1">删除好友</a></li>
@@ -237,6 +238,41 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="modal fade" id="view_friend_info_modal" tabindex"-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times</button>
+                                    <h4 class="modal-title">用户信息</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form class="form text-left" role="form" action="#" method="post" accept-charset="utf-8" onsubmit="return false;">
+                                        <div class="form-group">
+                                            <label for="n_userid" class="control-label">用户 ID</label>
+                                            <input class="form-control" ng-disabled="true" type="text" ng-model="friend.info.userid" placeholder="ID" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="n_nickname" class="control-label">用户昵称</label>
+                                            <input class="form-control" ng-disabled="true" type="text" ng-model="friend.info.nickname" placeholder="昵称" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="n_email" class="control-label">用户邮箱</label>
+                                            <input class="form-control" ng-disabled="true" type="email" ng-model="friend.info.email" placeholder="邮箱" required>
+                                        </div>
+                                        <div class="form-group btn-group btn-group-justified" role="group">
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="from-control btn btn-default" data-dismiss="modal">关闭窗口</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <!-- space -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="groups" style="display: none;">
@@ -287,6 +323,7 @@
                     <div id="context-group-menu" style="position: absolute; z-index: 9999; top: 389px; left: 558px;" class="">
                         <ul class="dropdown-menu" role="menu">
                             <li data-action="chat"><a tabindex="-1">发起聊天</a></li>
+                            <li data-action="view_info"><a tabindex="-1">群组信息</a></li>
                             <li data-action="view_record"><a tabindex="-1">聊天记录</a></li>
                             <li class="divider"></li>
                             <li data-action="delete"><a tabindex="-1">删除群组</a></li>
@@ -420,6 +457,45 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="modal fade" id="view_group_info_modal" tabindex"-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times</button>
+                                    <h4 class="modal-title">用户信息</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form class="form text-left" role="form" action="#" method="post" accept-charset="utf-8" onsubmit="return false;">
+                                        <div class="form-group">
+                                            <label for="n_userid" class="control-label">群组 ID</label>
+                                            <input class="form-control" ng-disabled="true" type="text" ng-model="group.info.groupid" placeholder="ID" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="n_userid" class="control-label">群组管理员 ID</label>
+                                            <input class="form-control" ng-disabled="true" type="text" ng-model="group.info.admin" placeholder="管理员 ID" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="n_nickname" class="control-label">群组名称</label>
+                                            <input class="form-control" ng-disabled="true" type="text" ng-model="group.info.groupname" placeholder="名称" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="n_email" class="control-label">群组描述</label>
+                                            <input class="form-control" ng-disabled="true" type="email" ng-model="group.info.description" placeholder="描述" required>
+                                        </div>
+                                        <div class="form-group btn-group btn-group-justified" role="group">
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="from-control btn btn-default" data-dismiss="modal">关闭窗口</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <!-- space -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="rooms" style="display: none;">
@@ -434,13 +510,16 @@
                             <strong class="text-center">{{ x.roomname }}</strong>
                         </li>
                     </ul>
+                    
                     <div id="context-room-menu" style="position: absolute; z-index: 9999; top: 389px; left: 558px;" class="">
                         <ul class="dropdown-menu" role="menu">
                             <li data-action="enter"><a tabindex="-1">进入聊天室</a></li>
+                            <li data-action="view_info"><a tabindex="-1">聊天室信息</a></li>
                             <li class="divider"></li>
                             <li data-action="viewnotes"><a tabindex="-1">查看留言板</a></li>
                         </ul>
                     </div>
+                    
                     <div class="modal fade" id="view_notes_modal" tabindex="-1", role="dialog" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -480,6 +559,41 @@
                                             </span>
                                         </div>
                                     </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="view_room_info_modal" tabindex"-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times</button>
+                                    <h4 class="modal-title">聊天室信息</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form class="form text-left" role="form" action="#" method="post" accept-charset="utf-8" onsubmit="return false;">
+                                        <div class="form-group">
+                                            <label for="n_userid" class="control-label">聊天室 ID</label>
+                                            <input class="form-control" ng-disabled="true" type="text" ng-model="room.info.roomid" placeholder="ID">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="n_nickname" class="control-label">聊天室名称</label>
+                                            <input class="form-control" ng-disabled="true" type="text" ng-model="room.info.roomname" placeholder="名称" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="n_email" class="control-label">聊天室描述</label>
+                                            <input class="form-control" ng-disabled="true" type="email" ng-model="room.info.description" placeholder="描述" required>
+                                        </div>
+                                        <div class="form-group btn-group btn-group-justified" role="group">
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="from-control btn btn-default" data-dismiss="modal">关闭窗口</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <!-- space -->
                                 </div>
                             </div>
                         </div>
