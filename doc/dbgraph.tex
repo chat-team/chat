@@ -386,9 +386,10 @@
   \node[attribute] (mstatus) [below right=of message] {阅读状态} edge (message);
 
   \node[relationship] (group_chat_record) [below right=3.4cm of messaging] {群组聊天记录} edge node[above]{1} (group) edge node[above]{n} (message);
-  \node[relationship] (room_chat_record) [below=2cm of message] {聊天室聊天记录} edge node[right]{n} (message);
+  %% \node[relationship] (room_chat_record) [below=2cm of message] {聊天室聊天记录} edge node[right]{n} (message);
 
-  \node[entity] (room) [below=3cm of room_chat_record]{聊天室} edge node[right]{1} (room_chat_record) edge node[above]{1} (chatroom_state);
+  %% \node[entity] (room) [below=3cm of room_chat_record]{聊天室} edge node[right]{1} (room_chat_record) edge node[above]{1} (chatroom_state);
+  \node[entity] (room) [below=9cm of message]{聊天室} edge node[above]{1} (chatroom_state);
   \node[attribute] (rid) [above right=of room] {\key{聊天室号}} edge (room);
   \node[attribute] (rname) [below=of room] {聊天室名称} edge (room);
   \node[attribute] (rdesc) [below right=of room] {聊天室介绍} edge (room);
@@ -424,9 +425,9 @@
   \node[entity] (message) [right=6cm of messaging]{消息} edge node[above]{n} (messaging) edge node[above]{n} (friend_record);
 
   \node[relationship] (group_chat_record) [below right=3.4cm of messaging] {群组聊天记录} edge node[above]{1} (group) edge node[above]{n} (message);
-  \node[relationship] (room_chat_record) [below=2cm of message] {聊天室聊天记录} edge node[right]{n} (message);
+  %% \node[relationship] (room_chat_record) [below=2cm of message] {聊天室聊天记录} edge node[right]{n} (message);
 
-  \node[entity] (room) [below=3cm of room_chat_record]{聊天室} edge node[right]{1} (room_chat_record) edge node[above]{1} (chatroom_state);
+  \node[entity] (room) [below=9cm of message]{聊天室} edge node[above]{1} (chatroom_state);
 
   \node[relationship] (room_board) [right=4.5cm of room]{留言板归属} edge node[right]{1} (board) edge node[above]{1} (room);
 
