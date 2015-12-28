@@ -44,20 +44,20 @@ public class QueryRoomInfo extends HttpServlet {
         String sql = "SELECT * FROM chatroom WHERE roomid = ?";
         PreparedStatement ps = null;
         ResultSet rs = null;
-        String roomid = null, discription = null, roomname = null;
+        String roomid = null, description = null, roomname = null;
         try {
             ps = conn.prepareStatement(sql);
             ps.setString(1, targetid);
             rs = ps.executeQuery();
             if (rs.next()) {
                 roomid = rs.getString("roomid");
-                discription = rs.getString("discription");
+                description = rs.getString("description");
                 roomname = rs.getString("roomname");
             }
             writer.add("status", "success");
             writer.add("roomid", roomid);
             writer.add("roomname", roomname);
-            writer.add("discription", discription).write();
+            writer.add("description", description).write();
         } catch(Exception e) {
             e.printStackTrace();
         }

@@ -44,14 +44,14 @@ public class QueryGroupInfo extends HttpServlet {
         String sql = "SELECT * FROM group_info WHERE groupid = ?";
         PreparedStatement ps = null;
         ResultSet rs = null;
-        String admin = null, groupid = null, discription = null, groupname = null;
+        String admin = null, groupid = null, description = null, groupname = null;
         try {
             ps = conn.prepareStatement(sql);
             ps.setString(1, targetid);
             rs = ps.executeQuery();
             if (rs.next()) {
                 groupid = rs.getString("groupid");
-                discription = rs.getString("discription");
+                description = rs.getString("description");
                 admin = rs.getString("admin");
                 groupname = rs.getString("groupname");
             }
@@ -59,7 +59,7 @@ public class QueryGroupInfo extends HttpServlet {
             writer.add("groupid", groupid);
             writer.add("admin", admin);
             writer.add("groupname", groupname);
-            writer.add("discription", discription).write();
+            writer.add("description", description).write();
         } catch(Exception e) {
             e.printStackTrace();
         }
