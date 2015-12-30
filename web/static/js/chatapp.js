@@ -725,6 +725,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             },
         },
         unreads: [],
+        roomidle: false,
 
         Connect: function () {
             $scope.chat.socket.friend = new WebSocket('ws://' + location.host + '/chat/friend');
@@ -838,12 +839,17 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             var dom = $($event.currentTarget);
             var kind = dom.attr("data-kind");
             var id = dom.attr("data-id");
+            if (kind === 'room' && $scope.chat.roomidle) {
+                return;
+            }
             console.log("switch context: " + kind + "  " + id);
             if (kind === 'room') {
                 if (id !== $scope.chat.target.id) {
                     $scope.chat.LeaveRoom($scope.chat.target.id);
+                    $scope.chat.roomidle = true;
                     $timeout(function () {
                         $scope.chat.EnterRoom(id);
+                        $scope.chat.roomidle = false;
                     }, 500); // call back.
                     $scope.chat.unreads = [];
                 }
@@ -1015,7 +1021,7 @@ app.controller("HomeCtrl", function ($scope, $http, $location, $timeout) {
             $scope.group.Query();
             $scope.room.Query();
 
-            $scope.chat.Connect();
+            $timeout(function () { $scope.chat.Connect(); }, 1000);
 
             // js binding.
             $('div.chatting').bind('DOMSubtreeModified', function (evt) {

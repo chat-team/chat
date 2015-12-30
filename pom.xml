@@ -14,42 +14,42 @@
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>jsp-api</artifactId>
             <version>2.2</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
 	    <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>javax.websocket</groupId>
             <artifactId>javax.websocket-api</artifactId>
             <version>1.1</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>javax.json</groupId>
             <artifactId>javax.json-api</artifactId>
             <version>1.0</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.json</artifactId>
             <version>1.0</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.38</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -102,7 +102,59 @@
                     <warSourceDirectory>web</warSourceDirectory>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <include>src/*properties</include>
+                    <attachClasses>true</attachClasses>
+                    <archiveClasses>true</archiveClasses>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <version>1.4.8</version>
+
+                <configuration>
+                    <!-- <container>
+                        <containerId>tomcat8x</containerId>
+                        <type>remote</type>
+                    </container> -->
+                    <container>
+                        <containerId>tomcat8x</containerId>
+                        <type>installed</type>
+                        <home>D:\Tomcat</home>
+                    </container>
+
+                    <!-- <configuration>
+                        <type>runtime</type>
+                        <properties>
+                            <cargo.remote.username>tomcat</cargo.remote.username>
+                            <cargo.remote.password>tomcat</cargo.remote.password>
+                            <cargo.hostname>127.0.0.1</cargo.hostname>
+                            <cargo.protocol>http</cargo.protocol>
+                            <cargo.servlet.port>8080</cargo.servlet.port>
+                            <cargo.remote.uri>http://127.0.0.1:8080/manager/html</cargo.remote.uri>
+                        </properties>
+                    </configuration> -->
+                    <configuration>
+                        <type>existing</type>
+                        <home>D:\Tomcat</home>
+                    </configuration>
+
+                    <deployables>
+                        <deployable>
+                            <groupId>Chat</groupId>
+                            <artifactId>Chat</artifactId>
+                            <type>war</type>
+                            <properties>
+                                <context>ROOT</context>
+                            </properties>
+                        </deployable>
+                    </deployables>
+                    <deployer>
+                        <type>installed</type>
+                    </deployer>
+
+                </configuration>
+
             </plugin>
 
         </plugins>

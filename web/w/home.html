@@ -661,7 +661,7 @@
                         <div class="input-group">
                             <input type="text" maxlength="512" autocomplete="off" class="form-control" name="nextmsg" ng-model="chat.message" value="" placeholder="新消息" ng-disabled="!(chat.target.kind && chat.target.id)">
                             <span class="input-group-btn">
-                                <button class="btn btn-default" type="submit">发送</button>
+                                <button class="btn btn-default" type="submit" ng-disabled="!(chat.target.kind && chat.target.id)">发送</button>
                             </span>
                         </div>
                     </form>
